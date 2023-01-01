@@ -18,8 +18,9 @@ import org.bukkit.inventory.meta.SkullMeta;
 
 import me.ShanaChans.LordTags.Tag;
 import me.ShanaChans.LordTags.TagManager;
+import me.neoblade298.neocore.inventories.CoreInventory;
 
-public class LordTagsInventory extends CustomInventory
+public class LordTagsInventory extends CoreInventory
 {
 	private final int MENU_MODEL = 5000;
 	private final int TAG = 5001;
@@ -27,42 +28,31 @@ public class LordTagsInventory extends CustomInventory
 	private final int PREV = 5003;
 	private final int HEAD = 5004;
 	private int page;
-	private Inventory inv;
 	private ArrayList<String> ids;
 	private int tagAmount;
-	private Player p;
 	
 	public LordTagsInventory(Player p, int tagAmount, ArrayList<String> ids) 
 	{
-		inv = Bukkit.createInventory(p, 54, "§4Total Tags: " + tagAmount);
-		this.p = p;
+		super(p, Bukkit.createInventory(p, 54, "Â§4Total Tags: " + tagAmount));
 		this.ids = ids;
 		this.tagAmount = tagAmount;
 		page = 1;
 		
 		
 		invSetup();
-		setupInventory(p, inv, this);
 	}
 	
 	public void invSetup()
 	{
 		inv.clear();
-		String currentTag = TagManager.getPlayerTag(p);
-		if(currentTag == null || currentTag == "")
-		{
-			currentTag = "§7None";
-		}
-		else
-		{
-			currentTag = TagManager.getTags().get(currentTag).getTagDisplay();
-		}
+		Tag curr = TagManager.getPlayerTag(p);
+		String currDisplay = curr == null ? "Â§7None" : curr.getTagDisplay();
 		
 		ItemStack[] contents = inv.getContents();
 		ItemStack border = createGuiItem(Material.BLACK_STAINED_GLASS_PANE, MENU_MODEL, " ", " ");
-		ItemStack head = createGuiItem(Material.PLAYER_HEAD, HEAD, "§6Current Tag§7: " + currentTag, "§7Click to remove current tag!");
-		ItemStack next = createGuiItem(Material.GREEN_STAINED_GLASS_PANE, NEXT, "§6Next", "§7Page " + (page + 1));
-		ItemStack prev = createGuiItem(Material.RED_STAINED_GLASS_PANE, PREV, "§6Previous", "§7Page " + (page - 1));
+		ItemStack head = createGuiItem(Material.PLAYER_HEAD, HEAD, "Â§6Current TagÂ§7: " + currDisplay, "Â§7Click to remove current tag!");
+		ItemStack next = createGuiItem(Material.GREEN_STAINED_GLASS_PANE, NEXT, "Â§6Next", "Â§7Page " + (page + 1));
+		ItemStack prev = createGuiItem(Material.RED_STAINED_GLASS_PANE, PREV, "Â§6Previous", "Â§7Page " + (page - 1));
 		SkullMeta playerHead = (SkullMeta) head.getItemMeta();
 		playerHead.setOwningPlayer(p);
 		head.setItemMeta(playerHead);
@@ -127,21 +117,21 @@ public class LordTagsInventory extends CustomInventory
 					continue;
 				}
 				
-				Tag tag = TagManager.getTags().get(ids.get(k));
+				Tag tag = TagManager.getTag(ids.get(k));
 				ItemStack item = new ItemStack(Material.NAME_TAG, 1);
 				ItemMeta meta = item.getItemMeta();
 				ArrayList<String> lore = new ArrayList<String>();
-				lore.add("§6Display§7: §f" + tag.getTagDisplay());
-				lore.add("§7" + tag.getTagDesc());
+				lore.add("Â§6DisplayÂ§7: Â§f" + tag.getTagDisplay());
+				lore.add("Â§7" + tag.getTagDesc());
 				//System.out.println(TagManager.getPlayers().get(p.getUniqueId()).getCurrentTag());
 				//.out.println(tag.getTagId());
-				if(TagManager.getPlayers().get(p.getUniqueId()).getCurrentTag().equals(tag.getTagId()))
+				if(TagManager.getPlayerTag(p).getTagId().equals(tag.getTagId()))
 				{
 					meta.addEnchant(Enchantment.LUCK, 1, true);
 					meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
 				}
 				meta.setLore(lore);
-				meta.setDisplayName("§cID: " + tag.getTagId());
+				meta.setDisplayName("Â§cID: " + tag.getTagId());
 				meta.setCustomModelData(TAG);
 				item.setItemMeta(meta);
 				
@@ -189,12 +179,12 @@ public class LordTagsInventory extends CustomInventory
 		if(isTag(e.getCurrentItem()))
 		{
 			String id = e.getCurrentItem().getItemMeta().getDisplayName().substring(6);
-			TagManager.getPlayers().get(((Player) e.getWhoClicked()).getUniqueId()).setCurrentTag(id);
+			TagManager.setPlayerTag((Player) e.getWhoClicked(), id);
 			invSetup();
 		}
 		if(isHead(e.getCurrentItem()))
 		{
-			TagManager.getPlayers().get(((Player) e.getWhoClicked()).getUniqueId()).setCurrentTag("");
+			TagManager.removePlayerTag(p);
 			invSetup();
 		}
 	}

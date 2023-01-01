@@ -52,31 +52,31 @@ public class Tag
 	}
 	
 	public void preview(CommandSender s) {
-		s.sendMessage("§7-- §cTag Creation §7--");
+		s.sendMessage("Â§7-- Â§cTag Creation Â§7--");
 		if (tagId == null) {
-			s.sendMessage("§cID§7: Not set");
+			s.sendMessage("Â§cIDÂ§7: Not set");
 		}
 		else {
-			s.sendMessage("§cID§7: " + getTagId());
+			s.sendMessage("Â§cIDÂ§7: " + getTagId());
 		}
 		if (tagDisplay == null) {
-			s.sendMessage("§cDisplay§7: Not set");
+			s.sendMessage("Â§cDisplayÂ§7: Not set");
 		}
 		else {
-			s.sendMessage("§cDisplay§7: " + getTagDisplay());
+			s.sendMessage("Â§cDisplayÂ§7: " + getTagDisplay());
 		}
 		if (tagDesc == null) {
-			s.sendMessage("§cDescription§7: Not set");
+			s.sendMessage("Â§cDescriptionÂ§7: Not set");
 		}
 		else {
-			s.sendMessage("§cDescription§7: " + getTagDesc());
+			s.sendMessage("Â§cDescriptionÂ§7: " + getTagDesc());
 		}
 	}
 	
-	public void post(CommandSender s, String id, Tag tag)
+	public void post(CommandSender s, Tag tag)
 	{
-		TagManager.getTags().put(id, tag);
-		s.sendMessage("§7Successfully created Tag!");
+		TagManager.createTag(tag);
+		s.sendMessage("Â§7Successfully created Tag!");
 	}
 
 }

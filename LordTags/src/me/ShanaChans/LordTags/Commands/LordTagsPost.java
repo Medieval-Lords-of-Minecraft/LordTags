@@ -44,7 +44,7 @@ public class LordTagsPost implements Subcommand
 		String author = sender.getName();
 		if(!TagManager.getTagCreation().containsKey(author))
 		{
-			sender.sendMessage("ง7You are not creating a Tag!");
+			sender.sendMessage("ยง7You are not creating a Tag!");
 			return;
 		}
 		
@@ -52,17 +52,17 @@ public class LordTagsPost implements Subcommand
 		
 		if(!tag.isFilled())
 		{
-			sender.sendMessage("ง7You must fill all parts of a Tag!");
+			sender.sendMessage("ยง7You must fill all parts of a Tag!");
 			return;
 		}
 		
-		if(TagManager.getTags().containsKey(tag.getTagId()))
+		if(TagManager.tagExists(tag.getTagId()))
 		{
-			sender.sendMessage("ง7Tag with this Id already exists!");
+			sender.sendMessage("ยง7Tag with this Id already exists!");
 			return;
 		}
 		
-		tag.post(sender,tag.getTagId(), tag);
+		tag.post(sender, tag);
 		TagManager.getTagCreation().remove(author);
 	}
 }

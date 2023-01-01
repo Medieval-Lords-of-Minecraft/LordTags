@@ -13,28 +13,24 @@ public class LordTagsCreate implements Subcommand
 	@Override
 	public String getDescription() 
 	{
-		// TODO Auto-generated method stub
 		return "Create a tag";
 	}
 
 	@Override
 	public String getKey() 
 	{
-		// TODO Auto-generated method stub
 		return "create";
 	}
 
 	@Override
 	public String getPermission() 
 	{
-		// TODO Auto-generated method stub
 		return "lordtags.admin";
 	}
 
 	@Override
 	public SubcommandRunner getRunner() 
 	{
-		// TODO Auto-generated method stub
 		return SubcommandRunner.BOTH;
 	}
 
@@ -43,16 +39,16 @@ public class LordTagsCreate implements Subcommand
 	{
 		if(args.length > 0)
 		{
-			if(TagManager.getTags().containsKey(args[0]))
+			if(TagManager.tagExists(args[0]))
 			{
-				sender.sendMessage("ง7Tag ID already exists!");
+				sender.sendMessage("ยง7Tag ID already exists!");
 				return;
 			}
 			
 			String author = sender.getName();
 			if(TagManager.getTagCreation().containsKey(author))
 			{
-				sender.sendMessage("ง7You are already creating a Tag!");
+				sender.sendMessage("ยง7You are already creating a Tag!");
 				return;
 			}
 			Tag tag = new Tag(args[0]);

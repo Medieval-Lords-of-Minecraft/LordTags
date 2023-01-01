@@ -42,7 +42,7 @@ public class LordTagsDisplay implements Subcommand
 			String author = sender.getName();
 			if(!TagManager.getTagCreation().containsKey(author))
 			{
-				sender.sendMessage("ง7You are not creating a Tag!");
+				sender.sendMessage("ยง7You are not creating a Tag!");
 				return;
 			}
 			Tag tag = TagManager.getTagCreation().get(author);

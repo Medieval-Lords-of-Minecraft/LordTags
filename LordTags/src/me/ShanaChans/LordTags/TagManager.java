@@ -23,7 +23,6 @@ import me.ShanaChans.LordTags.Commands.LordTagsPost;
 import me.ShanaChans.LordTags.Commands.LordTagsCancel;
 import me.ShanaChans.LordTags.Commands.LordTagsCommand;
 import me.ShanaChans.LordTags.Commands.LordTagsRemove;
-import me.ShanaChans.LordTags.Inventories.CustomInventory;
 import me.ShanaChans.LordTags.Inventories.LordTagsInventory;
 import me.neoblade298.neocore.commands.CommandManager;
 import net.luckperms.api.LuckPerms;
@@ -34,16 +33,15 @@ import net.luckperms.api.node.Node;
 public class TagManager extends JavaPlugin implements Listener{
 	private static TagManager inst;
 	private static HashMap<String, Tag> tags = new HashMap<String, Tag>();
-	private static HashMap<UUID, TagPlayer> players = new HashMap<UUID, TagPlayer>();
+	private static HashMap<UUID, Tag> playerTags = new HashMap<UUID, Tag>();
 	private static HashMap<String, Tag> tagCreation = new HashMap<String, Tag>();
-	public static HashMap<Player, CustomInventory> viewingInventory = new HashMap<Player, CustomInventory>();
 	private static LuckPerms api;
 	
 	public void onEnable() {
 		Bukkit.getServer().getLogger().info("LordTags Enabled");
 		Bukkit.getPluginManager().registerEvents(this, this);
 		initCommands();
-		tags.put("Stitch", new Tag("Stitch", "ง9Stitch" , "Donated for this tag!"));
+		tags.put("Stitch", new Tag("Stitch", "ยง9Stitch" , "Donated for this tag!"));
 		tags.put("Test1", new Tag("Test1", "Test1" , "Test1"));
 		tags.put("Test2", new Tag("Test2", "Test1" , "Test1"));
 		tags.put("Test3", new Tag("Test3", "Test1" , "Test1"));
@@ -126,17 +124,33 @@ public class TagManager extends JavaPlugin implements Listener{
 		return inst;
 	}
 
-	public static HashMap<UUID, TagPlayer> getPlayers() {
-		return players;
-	}
-
-	public static HashMap<String, Tag> getTags() {
-		return tags;
+	public static Tag getTag(String id) {
+		return tags.get(id);
 	}
 	
-	public static String getPlayerTag(Player p)
+	public static boolean tagExists(String id) {
+		return tags.containsKey(id);
+	}
+	
+	public static void createTag(Tag tag) {
+		tags.put(tag.getTagId(), tag);
+	}
+	
+	public static Tag getPlayerTag(Player p)
 	{
-		return players.get(p.getUniqueId()).getCurrentTag();
+		return playerTags.get(p.getUniqueId());
+	}
+	
+	public static void setPlayerTag(Player p, Tag tag) {
+		playerTags.put(p.getUniqueId(), tag);
+	}
+	
+	public static void setPlayerTag(Player p, String id) {
+		setPlayerTag(p, tags.get(id));
+	}
+	
+	public static void removePlayerTag(Player p) {
+		playerTags.remove(p.getUniqueId());
 	}
 
 	public static HashMap<String, Tag> getTagCreation() {
@@ -146,34 +160,6 @@ public class TagManager extends JavaPlugin implements Listener{
 	@EventHandler
     public void join(PlayerJoinEvent e) 
     {
-       if(!players.containsKey(e.getPlayer().getUniqueId()))
-       {
-    	   players.put(e.getPlayer().getUniqueId(), new TagPlayer(""));
-       }
+		// Load player's tag
     }
-	
-	@EventHandler
-	public void onInventoryClick(InventoryClickEvent e) {
-		Player p = (Player) e.getWhoClicked();
-		if (viewingInventory.containsKey(p)) {
-			viewingInventory.get(p).handleInventoryClick(e);
-		}
-	}
-
-	@EventHandler
-	public void onInventoryDrag(InventoryDragEvent e) {
-		Player p = (Player) e.getWhoClicked();
-		if (viewingInventory.containsKey(p)) {
-			viewingInventory.get(p).handleInventoryDrag(e);
-		}
-	}
-
-	@EventHandler
-	public void onInventoryClose(InventoryCloseEvent e) {
-		Player p = (Player) e.getPlayer();
-		if (viewingInventory.containsKey(p) && e.getInventory() != null && e.getInventory() == viewingInventory.get(p).getInventory()) {
-			viewingInventory.get(p).handleInventoryClose(e);
-			viewingInventory.remove(p);
-		}
-	}
 }
