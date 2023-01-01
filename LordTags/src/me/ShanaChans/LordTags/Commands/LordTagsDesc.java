@@ -53,7 +53,7 @@ public class LordTagsDesc implements Subcommand
 				desc += " " + args[i];
 			}
 			
-			tag.setTagDesc(desc);
+			tag.setDesc(desc);
 			tag.preview(sender);
 		}
 		

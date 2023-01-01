@@ -10,7 +10,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -46,7 +45,7 @@ public class LordTagsInventory extends CoreInventory
 	{
 		inv.clear();
 		Tag curr = TagManager.getPlayerTag(p);
-		String currDisplay = curr == null ? "§7None" : curr.getTagDisplay();
+		String currDisplay = curr == null ? "§7None" : curr.getDisplay();
 		
 		ItemStack[] contents = inv.getContents();
 		ItemStack border = createGuiItem(Material.BLACK_STAINED_GLASS_PANE, MENU_MODEL, " ", " ");
@@ -121,17 +120,18 @@ public class LordTagsInventory extends CoreInventory
 				ItemStack item = new ItemStack(Material.NAME_TAG, 1);
 				ItemMeta meta = item.getItemMeta();
 				ArrayList<String> lore = new ArrayList<String>();
-				lore.add("§6Display§7: §f" + tag.getTagDisplay());
-				lore.add("§7" + tag.getTagDesc());
+				lore.add("§6Display§7: §f" + tag.getDisplay());
+				lore.add("§7" + tag.getDesc());
 				//System.out.println(TagManager.getPlayers().get(p.getUniqueId()).getCurrentTag());
 				//.out.println(tag.getTagId());
-				if(TagManager.getPlayerTag(p).getTagId().equals(tag.getTagId()))
+				boolean selected = curr != null && curr.getId().equals(tag.getId());
+				if(selected)
 				{
 					meta.addEnchant(Enchantment.LUCK, 1, true);
 					meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
 				}
 				meta.setLore(lore);
-				meta.setDisplayName("§cID: " + tag.getTagId());
+				meta.setDisplayName("§cID: " + tag.getId() + (selected ? "§9 (Selected)" : ""));
 				meta.setCustomModelData(TAG);
 				item.setItemMeta(meta);
 				

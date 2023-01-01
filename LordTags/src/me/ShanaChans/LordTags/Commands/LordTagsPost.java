@@ -56,7 +56,7 @@ public class LordTagsPost implements Subcommand
 			return;
 		}
 		
-		if(TagManager.tagExists(tag.getTagId()))
+		if(TagManager.tagExists(tag.getId()))
 		{
 			sender.sendMessage("§7Tag with this Id already exists!");
 			return;

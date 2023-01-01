@@ -9,9 +9,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryCloseEvent;
-import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -41,7 +38,7 @@ public class TagManager extends JavaPlugin implements Listener{
 		Bukkit.getServer().getLogger().info("LordTags Enabled");
 		Bukkit.getPluginManager().registerEvents(this, this);
 		initCommands();
-		tags.put("Stitch", new Tag("Stitch", "§9Stitch" , "Donated for this tag!"));
+		tags.put("Stitch", new Tag("Stitch", "&9Stitch" , "Donated for this tag!"));
 		tags.put("Test1", new Tag("Test1", "Test1" , "Test1"));
 		tags.put("Test2", new Tag("Test2", "Test1" , "Test1"));
 		tags.put("Test3", new Tag("Test3", "Test1" , "Test1"));
@@ -133,7 +130,7 @@ public class TagManager extends JavaPlugin implements Listener{
 	}
 	
 	public static void createTag(Tag tag) {
-		tags.put(tag.getTagId(), tag);
+		tags.put(tag.getId(), tag);
 	}
 	
 	public static Tag getPlayerTag(Player p)

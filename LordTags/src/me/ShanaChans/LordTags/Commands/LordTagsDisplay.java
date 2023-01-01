@@ -53,7 +53,7 @@ public class LordTagsDisplay implements Subcommand
 				display += " " + args[i];
 			}
 			
-			tag.setTagDisplay(display);
+			tag.setDisplay(display);
 			tag.preview(sender);
 		}
 		

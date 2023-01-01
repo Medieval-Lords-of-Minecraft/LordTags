@@ -6,70 +6,70 @@ import me.neoblade298.neocore.util.Util;
 
 public class Tag 
 {
-	private String tagId;
-	private String tagDisplay;
-	private String tagDesc;
+	private String id;
+	private String display;
+	private String desc;
 	
-	public Tag(String tagId)
+	public Tag(String id)
 	{
-		this.tagId = tagId;
+		this.id = id;
 	}
 	
-	public Tag(String tagId, String tagDisplay, String tagDesc)
+	public Tag(String id, String display, String desc)
 	{
-		this.tagId = tagId;
-		this.tagDisplay = tagDisplay;
-		this.tagDesc = tagDesc;
+		this.id = id;
+		this.display = display;
+		this.desc = desc;
 	}
 
-	public String getTagId() {
-		return tagId;
+	public String getId() {
+		return id;
 	}
 
-	public void setTagId(String tagId) {
-		this.tagId = tagId;
+	public void setId(String id) {
+		this.id = id;
 	}
 
-	public String getTagDisplay() {
-		return tagDisplay;
+	public String getDisplay() {
+		return display;
 	}
 
-	public void setTagDisplay(String tagDisplay) {
-		this.tagDisplay = Util.translateColors(tagDisplay);
+	public void setDisplay(String display) {
+		this.display = Util.translateColors(display);
 	}
 
-	public String getTagDesc() {
-		return tagDesc;
+	public String getDesc() {
+		return desc;
 	}
 
-	public void setTagDesc(String tagDesc) {
-		this.tagDesc = tagDesc;
+	public void setDesc(String desc) {
+		this.desc = desc;
 	}
 	
 	public boolean isFilled()
 	{
-		return tagId != null && tagDisplay != null && tagDesc != null;
+		return id != null && display != null && desc != null;
 	}
 	
 	public void preview(CommandSender s) {
 		s.sendMessage("§7-- §cTag Creation §7--");
-		if (tagId == null) {
+		if (id == null) {
 			s.sendMessage("§cID§7: Not set");
 		}
 		else {
-			s.sendMessage("§cID§7: " + getTagId());
+			s.sendMessage("§cID§7: " + getId());
 		}
-		if (tagDisplay == null) {
+		if (display == null) {
 			s.sendMessage("§cDisplay§7: Not set");
 		}
 		else {
-			s.sendMessage("§cDisplay§7: " + getTagDisplay());
+			s.sendMessage("§cDisplay§7: " + getDisplay());
 		}
-		if (tagDesc == null) {
+		if (desc == null) {
 			s.sendMessage("§cDescription§7: Not set");
 		}
 		else {
-			s.sendMessage("§cDescription§7: " + getTagDesc());
+			s.sendMessage("§cDescription§7: " + getDesc());
 		}
 	}
 	
