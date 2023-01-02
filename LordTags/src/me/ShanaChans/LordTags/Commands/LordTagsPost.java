@@ -4,37 +4,40 @@ import org.bukkit.command.CommandSender;
 
 import me.ShanaChans.LordTags.Tag;
 import me.ShanaChans.LordTags.TagManager;
+import me.neoblade298.neocore.commands.CommandArguments;
 import me.neoblade298.neocore.commands.Subcommand;
 import me.neoblade298.neocore.commands.SubcommandRunner;
+import net.md_5.bungee.api.ChatColor;
 
 public class LordTagsPost implements Subcommand
 {
-
+	private static final CommandArguments args = new CommandArguments();
 	@Override
 	public String getDescription() 
 	{
-		// TODO Auto-generated method stub
-		return "Create a tag";
+		return "Complete tag creation";
 	}
 
 	@Override
 	public String getKey() 
 	{
-		// TODO Auto-generated method stub
 		return "post";
 	}
 
 	@Override
 	public String getPermission() 
 	{
-		// TODO Auto-generated method stub
 		return "lordtags.admin";
+	}
+	
+	@Override
+	public ChatColor getColor() {
+		return ChatColor.DARK_RED;
 	}
 
 	@Override
 	public SubcommandRunner getRunner() 
 	{
-		// TODO Auto-generated method stub
 		return SubcommandRunner.BOTH;
 	}
 
@@ -64,5 +67,10 @@ public class LordTagsPost implements Subcommand
 		
 		tag.post(sender, tag);
 		TagManager.getTagCreation().remove(author);
+	}
+	
+	@Override
+	public CommandArguments getArgs() {
+		return args;
 	}
 }

@@ -8,26 +8,30 @@ import me.neoblade298.neocore.commands.Subcommand;
 import me.neoblade298.neocore.commands.SubcommandRunner;
 import net.md_5.bungee.api.ChatColor;
 
-public class LordTagsRemove implements Subcommand
+public class LordTagsExit implements Subcommand
 {
 	private static final CommandArguments args = new CommandArguments();
 	@Override
-	public String getDescription() {
-		return "Remove tag";
+	public String getDescription() 
+	{
+		return "Exit out of tag creation";
 	}
 
 	@Override
-	public String getKey() {
-		return "remove";
+	public String getKey() 
+	{
+		return "exit";
 	}
 
 	@Override
-	public String getPermission() {
+	public String getPermission() 
+	{
 		return "lordtags.admin";
 	}
 
 	@Override
-	public SubcommandRunner getRunner() {
+	public SubcommandRunner getRunner() 
+	{
 		return SubcommandRunner.BOTH;
 	}
 	
@@ -37,8 +41,16 @@ public class LordTagsRemove implements Subcommand
 	}
 
 	@Override
-	public void run(CommandSender sender, String[] args) {
-		TagManager.removeTag(sender, args[0]);
+	public void run(CommandSender sender, String[] args) 
+	{
+		String author = sender.getName();
+		if(!TagManager.getTagCreation().containsKey(author))
+		{
+			sender.sendMessage("§7You are not creating a Tag!");
+			return;
+		}
+		sender.sendMessage("§7You have canceled creating a Tag!");
+		TagManager.getTagCreation().remove(author);
 	}
 	
 	@Override

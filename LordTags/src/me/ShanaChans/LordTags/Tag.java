@@ -75,7 +75,7 @@ public class Tag
 	
 	public void post(CommandSender s, Tag tag)
 	{
-		TagManager.createTag(tag);
+		TagManager.createTag(s, tag);
 		s.sendMessage("§7Successfully created Tag!");
 	}
 

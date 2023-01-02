@@ -6,31 +6,33 @@ import me.ShanaChans.LordTags.Tag;
 import me.ShanaChans.LordTags.TagManager;
 import me.neoblade298.neocore.commands.Subcommand;
 import me.neoblade298.neocore.commands.SubcommandRunner;
+import me.neoblade298.neocore.util.Util;
+import net.md_5.bungee.api.ChatColor;
 
 public class LordTagsDesc implements Subcommand
 {
-
 	@Override
 	public String getDescription() {
-		// TODO Auto-generated method stub
-		return "";
+		return "Set tag description";
 	}
 
 	@Override
 	public String getKey() {
-		// TODO Auto-generated method stub
 		return "desc";
 	}
 
 	@Override
 	public String getPermission() {
-		// TODO Auto-generated method stub
 		return "lordtags.admin";
+	}
+	
+	@Override
+	public ChatColor getColor() {
+		return ChatColor.DARK_RED;
 	}
 
 	@Override
 	public SubcommandRunner getRunner() {
-		// TODO Auto-generated method stub
 		return SubcommandRunner.BOTH;
 	}
 
@@ -47,11 +49,7 @@ public class LordTagsDesc implements Subcommand
 			}
 			Tag tag = TagManager.getTagCreation().get(author);
 			
-			String desc = args[0];
-			for(int i = 1; i < args.length; i++)
-			{
-				desc += " " + args[i];
-			}
+			String desc = Util.connectArgs(args, 1);
 			
 			tag.setDesc(desc);
 			tag.preview(sender);
@@ -59,5 +57,8 @@ public class LordTagsDesc implements Subcommand
 		
 	}
 	
-
+	@Override
+	public String getArgOverride() {
+		return "[Description]";
+	}
 }
