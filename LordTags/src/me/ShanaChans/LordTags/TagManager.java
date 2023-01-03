@@ -17,6 +17,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import me.ShanaChans.LordTags.Commands.*;
 import me.ShanaChans.LordTags.Inventories.LordTagsInventory;
@@ -79,7 +80,6 @@ public class TagManager extends JavaPlugin implements Listener, IOComponent {
 		tags.register(new LordTagsId());
 		tags.register(new LordTagsPost());
 		tags.register(new LordTagsExit());
-		tags.register(new LordTagsRemove());
 		tags.register(new LordTagsView());
 		tags.register(new LordTagsCommand());
 		tags.register(new LordTagsSet());
@@ -191,11 +191,13 @@ public class TagManager extends JavaPlugin implements Listener, IOComponent {
 			Tag tag = new Tag(msgs.get(0), msgs.get(1), msgs.get(2));
 			tags.put(tag.getId(), tag);
 			tagList.add(tag.getId());
+			Bukkit.getLogger().info("[LordTags] Received plugin message to add tag " + tag.getId());
 		}
 		else if (e.getChannel().equals("lordtags_removetag")) {
 			tags.remove(e.getMessages().get(0));
 			tagList.remove(e.getMessages().get(0));
 			removePlayersWithTag(e.getMessages().get(0));
+			Bukkit.getLogger().info("[LordTags] Received plugin message to remove tag " + e.getMessages().get(0));
 		}
 	}
 
@@ -204,22 +206,25 @@ public class TagManager extends JavaPlugin implements Listener, IOComponent {
 
 	@Override
 	public void loadPlayer(Player p, Statement stmt) {
-		try {
-			UUID uuid = p.getUniqueId();
-			ResultSet rs = stmt.executeQuery("SELECT * FROM lordtags_players WHERE uuid = '" + uuid + "';");
-			if (rs.next()) {
-				Tag tag = tags.get(rs.getString("tag"));
-				if (tag != null) {
-					playerTags.put(uuid, tag);
-				}
-				else {
-					Bukkit.getLogger().warning("[LordTags] Failed to load tag " + rs.getString("tag") + " for player " + p.getName());
+		new BukkitRunnable() {
+			public void run() {
+				try {
+					UUID uuid = p.getUniqueId();
+					ResultSet rs = stmt.executeQuery("SELECT * FROM lordtags_players WHERE uuid = '" + uuid + "';");
+					if (rs.next()) {
+						Tag tag = tags.get(rs.getString("tag"));
+						if (tag != null) {
+							playerTags.put(uuid, tag);
+						}
+						else {
+							Bukkit.getLogger().warning("[LordTags] Failed to load tag " + rs.getString("tag") + " for player " + p.getName());
+						}
+					}
+				} catch (SQLException e) {
+					e.printStackTrace();
 				}
 			}
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		}.runTaskLaterAsynchronously(this, 20L);
 	}
 
 	@Override

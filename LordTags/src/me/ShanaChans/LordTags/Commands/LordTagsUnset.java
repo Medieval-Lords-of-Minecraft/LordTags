@@ -47,8 +47,10 @@ public class LordTagsUnset implements Subcommand
 		Player p = args.length > 0 ? Bukkit.getPlayer(args[0]) : (Player) sender;
 		if (p == null) {
 			Util.msg(sender, "&cThat player isn't online right now!");
+			return;
 		}
 		TagManager.removePlayerTag(p);
+		Util.msg(sender, "&7Successfully unset player's tag");
 	}
 	
 	@Override

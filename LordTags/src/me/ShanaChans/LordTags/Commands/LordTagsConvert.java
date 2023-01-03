@@ -5,15 +5,12 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashSet;
 
-import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import me.ShanaChans.LordTags.Tag;
-import me.ShanaChans.LordTags.TagManager;
 import me.neoblade298.neocore.NeoCore;
-import me.neoblade298.neocore.commands.CommandArgument;
 import me.neoblade298.neocore.commands.CommandArguments;
 import me.neoblade298.neocore.commands.Subcommand;
 import me.neoblade298.neocore.commands.SubcommandRunner;
@@ -76,8 +73,6 @@ public class LordTagsConvert implements Subcommand
 				display = display.substring(0, display.length() - 1); // Remove space at end
 				tagObj.setDisplay(display);
 				tagObj.setDesc(tagObj.getDesc().substring(2)); // Remove first color code
-				System.out.println("INSERT INTO lordtags_tags VALUES('" + tagObj.getSqlId() + "','" + tagObj.getSqlDisplay() + "','" + tagObj.getSqlDesc() + "');");
-				stmt.executeUpdate("INSERT INTO lordtags_tags VALUES('" + tagObj.getSqlId() + "','" + tagObj.getSqlDisplay() + "','" + tagObj.getSqlDesc() + "');");
 			}
 			stmt.executeBatch();
 		} catch (SQLException e) {

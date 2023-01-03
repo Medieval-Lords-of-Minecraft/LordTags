@@ -15,7 +15,7 @@ import net.md_5.bungee.api.ChatColor;
 
 public class LordTagsSet implements Subcommand
 {
-	private static final CommandArguments args = new CommandArguments(new CommandArgument("tag id"), new CommandArgument("player", false));
+	private static final CommandArguments args = new CommandArguments(new CommandArgument("player", false), new CommandArgument("tag id"));
 	@Override
 	public String getDescription() {
 		return "Set the tag for a player";
@@ -44,20 +44,33 @@ public class LordTagsSet implements Subcommand
 	@Override
 	public void run(CommandSender sender, String[] args) 
 	{
-		Tag tag = TagManager.getTag(args[0].toLowerCase());
-		if (tag == null) {
-			Util.msg(sender, "&cThat tag doesn't exist!");
+		int offset = 0;
+		Player p;
+		if (args.length > 1) {
+			offset = 1;
+			p = Bukkit.getPlayer(args[0]);
+		}
+		else {
+			p = (Player) sender;
 		}
 		
-		Player p = args.length > 1 ? Bukkit.getPlayer(args[1]) : (Player) sender;
+		Tag tag = TagManager.getTag(args[offset].toLowerCase());
+		if (tag == null) {
+			Util.msg(sender, "&cThat tag doesn't exist!");
+			return;
+		}
+		
 		if (p == null) {
 			Util.msg(sender, "&cThat player isn't online right now!");
+			return;
 		}
 		
 		if (!p.hasPermission("lordtags.tag." + tag.getId())) {
 			Util.msg(sender, "&cThat player doesn't have the permission to use that tag!");
+			return;
 		}
 		TagManager.setPlayerTag(p, tag);
+		Util.msg(sender, "&7Successfully set player's tag");
 	}
 	
 	@Override
