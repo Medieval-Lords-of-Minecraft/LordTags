@@ -78,5 +78,9 @@ public class Tag
 		TagManager.createTag(s, tag);
 		s.sendMessage("§7Successfully created Tag!");
 	}
+	
+	public boolean equals(Tag tag) {
+		return id.equals(tag.id) && display.equals(tag.display) && desc.equals(tag.desc);
+	}
 
 }

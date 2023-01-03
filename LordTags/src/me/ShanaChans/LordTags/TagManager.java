@@ -18,13 +18,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import me.ShanaChans.LordTags.Commands.LordTagsCreate;
-import me.ShanaChans.LordTags.Commands.LordTagsDesc;
-import me.ShanaChans.LordTags.Commands.LordTagsDisplay;
-import me.ShanaChans.LordTags.Commands.LordTagsPost;
-import me.ShanaChans.LordTags.Commands.LordTagsExit;
-import me.ShanaChans.LordTags.Commands.LordTagsCommand;
-import me.ShanaChans.LordTags.Commands.LordTagsRemove;
+import me.ShanaChans.LordTags.Commands.*;
 import me.ShanaChans.LordTags.Inventories.LordTagsInventory;
 import me.neoblade298.neocore.NeoCore;
 import me.neoblade298.neocore.bungee.BungeeAPI;
@@ -100,9 +94,11 @@ public class TagManager extends JavaPlugin implements Listener, IOComponent {
 	
 	private void initCommands() {
 		CommandManager tags = new CommandManager("tags", this);
+		tags.register(new LordTagsAutopost());
 		tags.register(new LordTagsCreate());
 		tags.register(new LordTagsDesc());
 		tags.register(new LordTagsDisplay());
+		tags.register(new LordTagsId());
 		tags.register(new LordTagsPost());
 		tags.register(new LordTagsExit());
 		tags.register(new LordTagsRemove());
