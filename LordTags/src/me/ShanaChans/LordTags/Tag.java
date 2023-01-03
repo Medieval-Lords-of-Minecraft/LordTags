@@ -7,44 +7,61 @@ import me.neoblade298.neocore.util.Util;
 
 public class Tag implements Comparable<Tag>
 {
-	private String id;
-	private String display;
-	private String desc;
+	private String id, display, desc, sqlId, sqlDisplay, sqlDesc;
 	
 	public Tag(String id)
 	{
 		this.id = id.toLowerCase();
+		this.sqlId = this.id.replaceAll("'", "''");
 	}
 	
 	public Tag(String id, String display, String desc)
 	{
 		this.id = id.toLowerCase();
+		this.sqlId = this.id.replaceAll("'", "\\\\'");
 		this.display = display;
+		this.sqlDisplay = this.display.replaceAll("'", "\\\\'");
 		this.desc = desc;
+		this.sqlDesc = this.desc.replaceAll("'", "\\\\'");
 	}
 
 	public String getId() {
 		return id;
 	}
+	
+	public String getSqlId() {
+		return sqlId;
+	}
 
 	public void setId(String id) {
 		this.id = id.toLowerCase();
+		this.sqlId = this.id.replaceAll("'", "\\\\'");
 	}
 
 	public String getDisplay() {
 		return display;
 	}
+	
+	public String getSqlDisplay() {
+		return sqlDisplay;
+	}
 
 	public void setDisplay(String display) {
 		this.display = Util.translateColors(display);
+		this.sqlDisplay = this.display.replaceAll("'", "\\\\'");
 	}
 
 	public String getDesc() {
 		return desc;
 	}
+	
+	public String getSqlDesc() {
+		return sqlDesc;
+	}
 
 	public void setDesc(String desc) {
 		this.desc = desc;
+		this.sqlDesc = this.desc.replaceAll("'", "\\\\'");
 	}
 	
 	public boolean isFilled()

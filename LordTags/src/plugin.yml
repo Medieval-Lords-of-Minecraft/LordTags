@@ -1,6 +1,6 @@
 name: LordTags
 main: me.ShanaChans.LordTags.TagManager
-author: [ShanaChans]
+author: [ShanaChans, Neoblade298]
 depend: [NeoCore]
 version: 1.0
 api-version: 1.16

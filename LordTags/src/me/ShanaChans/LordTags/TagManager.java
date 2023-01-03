@@ -72,6 +72,7 @@ public class TagManager extends JavaPlugin implements Listener, IOComponent {
 	private void initCommands() {
 		CommandManager tags = new CommandManager("tags", this);
 		tags.register(new LordTagsAutopost());
+		tags.register(new LordTagsConvert());
 		tags.register(new LordTagsCreate());
 		tags.register(new LordTagsDesc());
 		tags.register(new LordTagsDisplay());
@@ -133,8 +134,8 @@ public class TagManager extends JavaPlugin implements Listener, IOComponent {
 		BungeeAPI.sendPluginMessage("lordtags_newtag", new String[] {tag.getId(), tag.getDisplay(), tag.getDesc()});
 		Util.msg(s, "&7Successfully created tag " + tag.getId());
 		try {
-			NeoCore.getStatement("TagManager").executeUpdate("INSERT INTO lordtags_tags Values('" + tag.getId() + "','"
-					+ tag.getDisplay() + "','" + tag.getDesc() + "');");
+			NeoCore.getStatement("TagManager").executeUpdate("INSERT INTO lordtags_tags Values('" + tag.getSqlId() + "','"
+					+ tag.getSqlDisplay() + "','" + tag.getSqlDesc() + "');");
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -231,7 +232,7 @@ public class TagManager extends JavaPlugin implements Listener, IOComponent {
 			if (playerTags.containsKey(uuid)) {
 				Tag tag = playerTags.get(uuid);
 				insert.executeUpdate("REPLACE INTO lordtags_players VALUES ('" + 
-						uuid + "','" + tag.getId() + "');");
+						uuid + "','" + tag.getSqlId() + "');");
 			}
 			else {
 				delete.executeUpdate("DELETE FROM lordtags_players WHERE uuid = '" + uuid + "';");
