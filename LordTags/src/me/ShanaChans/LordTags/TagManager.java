@@ -45,46 +45,11 @@ public class TagManager extends JavaPlugin implements Listener, IOComponent {
 		NeoCore.registerIOComponent(this, this, "TagManager");
 		inst = this;
 		
-		
-		
 		RegisteredServiceProvider<LuckPerms> provider = Bukkit.getServicesManager().getRegistration(LuckPerms.class);
         api = null;
         if (provider != null) {
             api = provider.getProvider();
         }
-	}
-	
-	public void test() {
-		tags.put("Stitch", new Tag("Stitch", "&9Stitch" , "Donated for this tag!"));
-		tags.put("Test1", new Tag("Test1", "Test1" , "Test1"));
-		tags.put("Test2", new Tag("Test2", "Test1" , "Test1"));
-		tags.put("Test3", new Tag("Test3", "Test1" , "Test1"));
-		tags.put("Test4", new Tag("Test4", "Test1" , "Test1"));
-		tags.put("Test5", new Tag("Test5", "Test1" , "Test1"));
-		tags.put("Test6", new Tag("Test6", "Test1" , "Test1"));
-		tags.put("Test7", new Tag("Test7", "Test1" , "Test1"));
-		tags.put("Test8", new Tag("Test8", "Test1" , "Test1"));
-		tags.put("Test9", new Tag("Test9", "Test1" , "Test1"));
-		tags.put("Test10", new Tag("Test10", "Test1" , "Test1"));
-		tags.put("Test11", new Tag("Test11", "Test1" , "Test1"));
-		tags.put("Test12", new Tag("Test12", "Test1" , "Test1"));
-		tags.put("Test13", new Tag("Test13", "Test1" , "Test1"));
-		tags.put("Test14", new Tag("Test14", "Test1" , "Test1"));
-		tags.put("Test15", new Tag("Test15", "Test1" , "Test1"));
-		tags.put("Test16", new Tag("Test16", "Test1" , "Test1"));
-		tags.put("Test17", new Tag("Test17", "Test1" , "Test1"));
-		tags.put("Test18", new Tag("Test18", "Test1" , "Test1"));
-		tags.put("Test19", new Tag("Test19", "Test1" , "Test1"));
-		tags.put("Test20", new Tag("Test20", "Test1" , "Test1"));
-		tags.put("Test21", new Tag("Test21", "Test1" , "Test1"));
-		tags.put("Test22", new Tag("Test22", "Test1" , "Test1"));
-		tags.put("Test23", new Tag("Test23", "Test1" , "Test1"));
-		tags.put("Test24", new Tag("Test24", "Test1" , "Test1"));
-		tags.put("Test25", new Tag("Test25", "Test1" , "Test1"));
-		tags.put("Test26", new Tag("Test26", "Test1" , "Test1"));
-		tags.put("Test27", new Tag("Test27", "Test1" , "Test1"));
-		tags.put("Test28", new Tag("Test28", "Test1" , "Test1"));
-		tags.put("Test29", new Tag("Test29", "Test1" , "Test1"));
 	}
 	
 	public void onDisable() {
@@ -147,6 +112,12 @@ public class TagManager extends JavaPlugin implements Listener, IOComponent {
 		tags.put(tag.getId(), tag);
 		BungeeAPI.sendPluginMessage("lordtags_newtag", new String[] {tag.getId(), tag.getDisplay(), tag.getDesc()});
 		Util.msg(s, "&7Successfully created tag " + tag.getId());
+		try {
+			NeoCore.getStatement("TagManager").executeUpdate("INSERT INTO LordTags_tags Values('" + tag.getId() + "','"
+					+ tag.getDisplay() + "','" + tag.getDesc() + "');");
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	// Only called by command to avoid endless pluginmsg loop
@@ -155,6 +126,11 @@ public class TagManager extends JavaPlugin implements Listener, IOComponent {
 		removePlayersWithTag(id);
 		BungeeAPI.sendPluginMessage("lordtags_removetag", new String[] {id});
 		Util.msg(s, "&7Successfully removed tag " + id);
+		try {
+			NeoCore.getStatement("TagManager").executeUpdate("DELETE FROM LordTags_tags WHERE id = '" + id + "';");
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public static Tag getPlayerTag(Player p)

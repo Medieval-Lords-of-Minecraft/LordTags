@@ -5,6 +5,7 @@ import org.bukkit.command.CommandSender;
 
 import me.ShanaChans.LordTags.Tag;
 import me.ShanaChans.LordTags.TagManager;
+import me.neoblade298.neocore.commands.CommandArgument;
 import me.neoblade298.neocore.commands.CommandArguments;
 import me.neoblade298.neocore.commands.Subcommand;
 import me.neoblade298.neocore.commands.SubcommandRunner;
@@ -60,16 +61,16 @@ public class LordTagsAutopost implements Subcommand
 			return;
 		}
 		
-		// Enter loop to find an unused number
-		int iter = 1;
+		// Enter loop to find an unused number, limit to 10
 		String autoId = tag.getId();
-		while (true) {
+		for (int iter = 1; iter < 10; iter++) {
 			// Auto id tag does not exist
 			if (!TagManager.tagExists(autoId)) {
 				tag.setId(autoId);
 				Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "lp user " + args[0] + " permission set lordtags.tag." + tag.getId());
 				Bukkit.getLogger().info("[LordTags] Auto-creator found tag id " + autoId + ", gave player " + args[0] + " tag.");
-				TagManager.createTag(sender, tag);
+				tag.post(sender, tag);
+				TagManager.getTagCreation().remove(author);
 				return;
 			}
 			
@@ -80,15 +81,14 @@ public class LordTagsAutopost implements Subcommand
 					// Tag exists and is the exact same, give player permission and end
 					Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "lp user " + args[0] + " permission set lordtags.tag." + tag.getId());
 					Bukkit.getLogger().info("[LordTags] Auto-creator found existing copy tag " + autoId + ", gave player " + args[0] + " tag.");
+					TagManager.getTagCreation().remove(author);
 					return;
 				}
 			}
 			
-			autoId = tag.getId() + (iter++);
+			autoId = tag.getId() + (iter);
 		}
-	
-		tag.post(sender, tag);
-		TagManager.getTagCreation().remove(author);
+		Bukkit.getLogger().warning("[LordTags] Auto-creator failed to create id with tag " + tag.getId());
 	}
 	
 	@Override
