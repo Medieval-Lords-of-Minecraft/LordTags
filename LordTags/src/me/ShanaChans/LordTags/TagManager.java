@@ -67,6 +67,7 @@ public class TagManager extends JavaPlugin implements Listener, IOComponent {
 		tags.register(new LordTagsPost());
 		tags.register(new LordTagsExit());
 		tags.register(new LordTagsRemove());
+		tags.register(new LordTagsView());
 		tags.register(new LordTagsCommand());
 		tags.registerCommandList("help");
 		this.getCommand("tags").setExecutor(tags);

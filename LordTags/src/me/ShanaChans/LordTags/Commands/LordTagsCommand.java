@@ -26,11 +26,6 @@ public class LordTagsCommand implements Subcommand
 	public String getPermission() {
 		return null;
 	}
-	
-	@Override
-	public ChatColor getColor() {
-		return ChatColor.DARK_RED;
-	}
 
 	@Override
 	public SubcommandRunner getRunner() {

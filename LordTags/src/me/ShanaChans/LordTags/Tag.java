@@ -12,12 +12,12 @@ public class Tag
 	
 	public Tag(String id)
 	{
-		this.id = id;
+		this.id = id.toLowerCase();
 	}
 	
 	public Tag(String id, String display, String desc)
 	{
-		this.id = id;
+		this.id = id.toLowerCase();
 		this.display = display;
 		this.desc = desc;
 	}
@@ -27,7 +27,7 @@ public class Tag
 	}
 
 	public void setId(String id) {
-		this.id = id;
+		this.id = id.toLowerCase();
 	}
 
 	public String getDisplay() {

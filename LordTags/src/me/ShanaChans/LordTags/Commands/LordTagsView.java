@@ -4,21 +4,23 @@ import org.bukkit.command.CommandSender;
 
 import me.ShanaChans.LordTags.Tag;
 import me.ShanaChans.LordTags.TagManager;
+import me.neoblade298.neocore.commands.CommandArgument;
+import me.neoblade298.neocore.commands.CommandArguments;
 import me.neoblade298.neocore.commands.Subcommand;
 import me.neoblade298.neocore.commands.SubcommandRunner;
-import me.neoblade298.neocore.util.Util;
 import net.md_5.bungee.api.ChatColor;
 
-public class LordTagsDesc implements Subcommand
+public class LordTagsView implements Subcommand
 {
+	private static final CommandArguments args = new CommandArguments(new CommandArgument("id"));
 	@Override
 	public String getDescription() {
-		return "Set tag description";
+		return "View tag creation page";
 	}
 
 	@Override
 	public String getKey() {
-		return "desc";
+		return "view";
 	}
 
 	@Override
@@ -39,26 +41,18 @@ public class LordTagsDesc implements Subcommand
 	@Override
 	public void run(CommandSender sender, String[] args) 
 	{
-		if(args.length > 0)
+		String author = sender.getName();
+		if(!TagManager.getTagCreation().containsKey(author))
 		{
-			String author = sender.getName();
-			if(!TagManager.getTagCreation().containsKey(author))
-			{
-				sender.sendMessage("§7You are not creating a Tag!");
-				return;
-			}
-			Tag tag = TagManager.getTagCreation().get(author);
-			
-			String desc = Util.connectArgs(args, 0);
-			
-			tag.setDesc(desc);
-			tag.preview(sender);
+			sender.sendMessage("§7You are not creating a Tag!");
+			return;
 		}
-		
+		Tag tag = TagManager.getTagCreation().get(author);
+		tag.preview(sender);
 	}
 	
 	@Override
-	public String getArgOverride() {
-		return "[Description]";
+	public CommandArguments getArgs() {
+		return args;
 	}
 }
