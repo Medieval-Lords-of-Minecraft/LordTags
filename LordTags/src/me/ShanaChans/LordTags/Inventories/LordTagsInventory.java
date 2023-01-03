@@ -15,9 +15,11 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
+import de.tr7zw.nbtapi.NBTItem;
 import me.ShanaChans.LordTags.Tag;
 import me.ShanaChans.LordTags.TagManager;
 import me.neoblade298.neocore.inventories.CoreInventory;
+import me.neoblade298.neocore.util.Util;
 
 public class LordTagsInventory extends CoreInventory
 {
@@ -29,7 +31,6 @@ public class LordTagsInventory extends CoreInventory
 	private int page;
 	private ArrayList<String> ids;
 	private int tagAmount;
-	private boolean hasAllTags;
 	
 	public LordTagsInventory(Player p, int tagAmount, ArrayList<String> ids) 
 	{
@@ -37,7 +38,6 @@ public class LordTagsInventory extends CoreInventory
 		this.ids = ids;
 		this.tagAmount = tagAmount;
 		page = 1;
-		hasAllTags = ids.get(0).equals("*");
 		
 		invSetup();
 	}
@@ -121,10 +121,7 @@ public class LordTagsInventory extends CoreInventory
 				ItemStack item = new ItemStack(Material.NAME_TAG, 1);
 				ItemMeta meta = item.getItemMeta();
 				ArrayList<String> lore = new ArrayList<String>();
-				lore.add("§6Display§7: §f" + tag.getDisplay());
 				lore.add("§7" + tag.getDesc());
-				//System.out.println(TagManager.getPlayers().get(p.getUniqueId()).getCurrentTag());
-				//.out.println(tag.getTagId());
 				boolean selected = curr != null && curr.getId().equals(tag.getId());
 				if(selected)
 				{
@@ -132,9 +129,12 @@ public class LordTagsInventory extends CoreInventory
 					meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
 				}
 				meta.setLore(lore);
-				meta.setDisplayName("§cID: " + tag.getId() + (selected ? "§9 (Selected)" : ""));
+				meta.setDisplayName(Util.translateColors(tag.getDisplay()) + (selected ? "§9 (Selected)" : ""));
 				meta.setCustomModelData(TAG);
 				item.setItemMeta(meta);
+				NBTItem nbti = new NBTItem(item);
+				nbti.setString("id", tag.getId());
+				nbti.applyNBT(item);
 				
 				contents[(10 + 9*i) + j] = item;
 				
@@ -179,8 +179,14 @@ public class LordTagsInventory extends CoreInventory
 		}
 		if(isTag(e.getCurrentItem()))
 		{
-			String id = e.getCurrentItem().getItemMeta().getDisplayName().substring(6);
-			TagManager.setPlayerTag((Player) e.getWhoClicked(), id);
+			NBTItem nbti = new NBTItem(e.getCurrentItem());
+			String id = nbti.getString("id");
+			if (e.getCurrentItem().containsEnchantment(Enchantment.LUCK)) {
+				TagManager.removePlayerTag(p);
+			}
+			else if (TagManager.tagExists(id)) {
+				TagManager.setPlayerTag((Player) e.getWhoClicked(), id);
+			}
 			invSetup();
 		}
 		if(isHead(e.getCurrentItem()))

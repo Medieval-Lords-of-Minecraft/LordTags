@@ -1,10 +1,11 @@
 package me.ShanaChans.LordTags;
 
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 
 import me.neoblade298.neocore.util.Util;
 
-public class Tag 
+public class Tag implements Comparable<Tag>
 {
 	private String id;
 	private String display;
@@ -77,10 +78,16 @@ public class Tag
 	{
 		TagManager.createTag(s, tag);
 		s.sendMessage("§7Successfully created Tag!");
+		Bukkit.getLogger().info("[LordTags] Created new tag with id " + tag.id);
 	}
 	
 	public boolean equals(Tag tag) {
 		return id.equals(tag.id) && display.equals(tag.display) && desc.equals(tag.desc);
+	}
+
+	@Override
+	public int compareTo(Tag o) {
+		return id.compareTo(o.id);
 	}
 
 }

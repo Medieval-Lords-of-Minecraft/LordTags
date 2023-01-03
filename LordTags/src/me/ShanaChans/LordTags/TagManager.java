@@ -35,6 +35,7 @@ public class TagManager extends JavaPlugin implements Listener, IOComponent {
 	private static TagManager inst;
 	private static HashMap<String, Tag> tags = new HashMap<String, Tag>();
 	private static HashMap<UUID, Tag> playerTags = new HashMap<UUID, Tag>();
+	private static ArrayList<String> tagList = new ArrayList<String>();
 	private static HashMap<String, Tag> tagCreation = new HashMap<String, Tag>();
 	private static LuckPerms api;
 	
@@ -44,6 +45,17 @@ public class TagManager extends JavaPlugin implements Listener, IOComponent {
 		initCommands();
 		NeoCore.registerIOComponent(this, this, "TagManager");
 		inst = this;
+		
+		try {
+			ResultSet rs = NeoCore.getStatement("TagManager").executeQuery("SELECT * FROM lordtags_tags;");
+			while (rs.next()) {
+				Tag tag = new Tag(rs.getString("id"), rs.getString("display"), rs.getString("desc"));
+				tags.put(tag.getId(), tag);
+				tagList.add(tag.getId());
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 		
 		RegisteredServiceProvider<LuckPerms> provider = Bukkit.getServicesManager().getRegistration(LuckPerms.class);
         api = null;
@@ -69,6 +81,8 @@ public class TagManager extends JavaPlugin implements Listener, IOComponent {
 		tags.register(new LordTagsRemove());
 		tags.register(new LordTagsView());
 		tags.register(new LordTagsCommand());
+		tags.register(new LordTagsSet());
+		tags.register(new LordTagsUnset());
 		tags.registerCommandList("help");
 		this.getCommand("tags").setExecutor(tags);
 	}
@@ -78,8 +92,8 @@ public class TagManager extends JavaPlugin implements Listener, IOComponent {
         ArrayList<String> ids = new ArrayList<String>();
         int tagAmount = 0;
 		if (p.hasPermission("lordtags.tag.*")) {
-			ids.add("*");
-			tagAmount = tags.size();
+			ids = tagList;
+			tagAmount = tagList.size();
 		}
 		else {
 			UserManager mngr = api.getUserManager();
@@ -115,10 +129,11 @@ public class TagManager extends JavaPlugin implements Listener, IOComponent {
 	// Only called by command to avoid endless pluginmsg loop
 	public static void createTag(CommandSender s, Tag tag) {
 		tags.put(tag.getId(), tag);
+		tagList.add(tag.getId());
 		BungeeAPI.sendPluginMessage("lordtags_newtag", new String[] {tag.getId(), tag.getDisplay(), tag.getDesc()});
 		Util.msg(s, "&7Successfully created tag " + tag.getId());
 		try {
-			NeoCore.getStatement("TagManager").executeUpdate("INSERT INTO LordTags_tags Values('" + tag.getId() + "','"
+			NeoCore.getStatement("TagManager").executeUpdate("INSERT INTO lordtags_tags Values('" + tag.getId() + "','"
 					+ tag.getDisplay() + "','" + tag.getDesc() + "');");
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -128,11 +143,12 @@ public class TagManager extends JavaPlugin implements Listener, IOComponent {
 	// Only called by command to avoid endless pluginmsg loop
 	public static void removeTag(CommandSender s, String id) {
 		tags.remove(id);
-		removePlayersWithTag(id);
+		tagList.remove(id);
+		
 		BungeeAPI.sendPluginMessage("lordtags_removetag", new String[] {id});
 		Util.msg(s, "&7Successfully removed tag " + id);
 		try {
-			NeoCore.getStatement("TagManager").executeUpdate("DELETE FROM LordTags_tags WHERE id = '" + id + "';");
+			NeoCore.getStatement("TagManager").executeUpdate("DELETE FROM lordtags_tags WHERE id = '" + id + "';");
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -173,9 +189,11 @@ public class TagManager extends JavaPlugin implements Listener, IOComponent {
 			ArrayList<String> msgs = e.getMessages();
 			Tag tag = new Tag(msgs.get(0), msgs.get(1), msgs.get(2));
 			tags.put(tag.getId(), tag);
+			tagList.add(tag.getId());
 		}
 		else if (e.getChannel().equals("lordtags_removetag")) {
 			tags.remove(e.getMessages().get(0));
+			tagList.remove(e.getMessages().get(0));
 			removePlayersWithTag(e.getMessages().get(0));
 		}
 	}
@@ -187,7 +205,7 @@ public class TagManager extends JavaPlugin implements Listener, IOComponent {
 	public void loadPlayer(Player p, Statement stmt) {
 		try {
 			UUID uuid = p.getUniqueId();
-			ResultSet rs = stmt.executeQuery("SELECT * FROM Lordtags_players WHERE uuid = '" + uuid + "';");
+			ResultSet rs = stmt.executeQuery("SELECT * FROM lordtags_players WHERE uuid = '" + uuid + "';");
 			if (rs.next()) {
 				Tag tag = tags.get(rs.getString("tag"));
 				if (tag != null) {
@@ -212,11 +230,11 @@ public class TagManager extends JavaPlugin implements Listener, IOComponent {
 			UUID uuid = p.getUniqueId();
 			if (playerTags.containsKey(uuid)) {
 				Tag tag = playerTags.get(uuid);
-				insert.executeUpdate("REPLACE INTO Lordtags_players VALUES ('" + 
+				insert.executeUpdate("REPLACE INTO lordtags_players VALUES ('" + 
 						uuid + "','" + tag.getId() + "');");
 			}
 			else {
-				delete.executeUpdate("DELETE FROM Lordtags_players WHERE uuid = '" + uuid + "';");
+				delete.executeUpdate("DELETE FROM lordtags_players WHERE uuid = '" + uuid + "';");
 			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block

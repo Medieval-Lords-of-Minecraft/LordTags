@@ -23,7 +23,7 @@ public class LordTagsAutopost implements Subcommand
 	@Override
 	public String getKey() 
 	{
-		return "post";
+		return "autopost";
 	}
 
 	@Override
