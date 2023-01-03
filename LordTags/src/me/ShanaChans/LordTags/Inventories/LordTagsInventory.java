@@ -29,6 +29,7 @@ public class LordTagsInventory extends CoreInventory
 	private int page;
 	private ArrayList<String> ids;
 	private int tagAmount;
+	private boolean hasAllTags;
 	
 	public LordTagsInventory(Player p, int tagAmount, ArrayList<String> ids) 
 	{
@@ -36,7 +37,7 @@ public class LordTagsInventory extends CoreInventory
 		this.ids = ids;
 		this.tagAmount = tagAmount;
 		page = 1;
-		
+		hasAllTags = ids.get(0).equals("*");
 		
 		invSetup();
 	}

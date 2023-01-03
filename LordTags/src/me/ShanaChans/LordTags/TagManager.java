@@ -75,24 +75,28 @@ public class TagManager extends JavaPlugin implements Listener, IOComponent {
 	
 	public static void openTags(Player p)
 	{
-		UserManager mngr = api.getUserManager();
-        User user = mngr.getUser(p.getName());
-        ArrayList<Node> tagPerms = (ArrayList<Node>) user.getNodes().stream()
-                .filter(node -> node.getKey().startsWith("lordtags.tag."))
-                .collect(Collectors.toList());
-        
-        int tagAmount = 0;
         ArrayList<String> ids = new ArrayList<String>();
-        
-        for(Node node : tagPerms)
-        {
-        	if(tags.containsKey(node.getKey().substring(13)))
-        	{
-        		ids.add(node.getKey().substring(13));
-            	tagAmount++;
-        	}
-        }
-        
+        int tagAmount = 0;
+		if (p.hasPermission("lordtags.tag.*")) {
+			ids.add("*");
+			tagAmount = tags.size();
+		}
+		else {
+			UserManager mngr = api.getUserManager();
+	        User user = mngr.getUser(p.getName());
+	        ArrayList<Node> tagPerms = (ArrayList<Node>) user.getNodes().stream()
+	                .filter(node -> node.getKey().startsWith("lordtags.tag."))
+	                .collect(Collectors.toList());
+	        
+	        for(Node node : tagPerms)
+	        {
+	        	if(tags.containsKey(node.getKey().substring(13)))
+	        	{
+	        		ids.add(node.getKey().substring(13));
+	            	tagAmount++;
+	        	}
+	        }
+		}
         new LordTagsInventory(p, tagAmount, ids);
 	}
 	
