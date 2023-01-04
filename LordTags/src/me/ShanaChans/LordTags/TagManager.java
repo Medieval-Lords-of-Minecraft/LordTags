@@ -73,7 +73,6 @@ public class TagManager extends JavaPlugin implements Listener, IOComponent {
 	private void initCommands() {
 		CommandManager tags = new CommandManager("tags", this);
 		tags.register(new LordTagsAutopost());
-		tags.register(new LordTagsConvert());
 		tags.register(new LordTagsCreate());
 		tags.register(new LordTagsDesc());
 		tags.register(new LordTagsDisplay());
@@ -241,7 +240,6 @@ public class TagManager extends JavaPlugin implements Listener, IOComponent {
 				delete.executeUpdate("DELETE FROM lordtags_players WHERE uuid = '" + uuid + "';");
 			}
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
