@@ -73,6 +73,7 @@ public class LordTagsConvert implements Subcommand
 				display = display.substring(0, display.length() - 1); // Remove space at end
 				tagObj.setDisplay(display);
 				tagObj.setDesc(tagObj.getDesc().substring(2)); // Remove first color code
+				System.out.println("Read tag " + tag);
 			}
 			stmt.executeBatch();
 		} catch (SQLException e) {

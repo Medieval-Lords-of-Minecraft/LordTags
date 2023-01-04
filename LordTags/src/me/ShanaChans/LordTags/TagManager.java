@@ -101,15 +101,13 @@ public class TagManager extends JavaPlugin implements Listener, IOComponent {
 	        User user = mngr.getUser(p.getName());
 	        ArrayList<Node> tagPerms = (ArrayList<Node>) user.getNodes().stream()
 	                .filter(node -> node.getKey().startsWith("lordtags.tag."))
+	                .filter(node -> TagManager.tagExists(node.getKey().substring(13).toLowerCase()))
 	                .collect(Collectors.toList());
 	        
 	        for(Node node : tagPerms)
 	        {
-	        	if(tags.containsKey(node.getKey().substring(13)))
-	        	{
-	        		ids.add(node.getKey().substring(13));
-	            	tagAmount++;
-	        	}
+        		ids.add(node.getKey().substring(13).toLowerCase());
+            	tagAmount++;
 	        }
 		}
         new LordTagsInventory(p, tagAmount, ids);
