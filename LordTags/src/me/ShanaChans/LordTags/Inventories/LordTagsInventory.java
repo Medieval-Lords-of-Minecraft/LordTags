@@ -29,14 +29,12 @@ public class LordTagsInventory extends CoreInventory
 	private final int PREV = 5003;
 	private final int HEAD = 5004;
 	private int page;
-	private ArrayList<String> ids;
-	private int tagAmount;
+	private ArrayList<Tag> tags;
 	
-	public LordTagsInventory(Player p, int tagAmount, ArrayList<String> ids) 
+	public LordTagsInventory(Player p, ArrayList<Tag> tags) 
 	{
-		super(p, Bukkit.createInventory(p, 54, "§4Total Tags: " + tagAmount));
-		this.ids = ids;
-		this.tagAmount = tagAmount;
+		super(p, Bukkit.createInventory(p, 54, "§4Total Tags: " + tags.size()));
+		this.tags = tags;
 		page = 1;
 		
 		invSetup();
@@ -96,7 +94,7 @@ public class LordTagsInventory extends CoreInventory
 		contents[52] = border;
 		
 		
-		if(tagAmount > 28 * page)
+		if(tags.size() > 28 * page)
 		{
 			contents[53] = next;
 		}
@@ -105,11 +103,11 @@ public class LordTagsInventory extends CoreInventory
 			contents[53] = border;
 		}
 		
-		if(!ids.isEmpty())
+		if(!tags.isEmpty())
 		{
 			int i = 0;
 			int j = 0;
-			for(int k = 0 + 28 * (page - 1); k < ids.size(); k++)
+			for(int k = 0 + 28 * (page - 1); k < tags.size(); k++)
 			{
 				
 				if(i >= 4)
@@ -117,7 +115,7 @@ public class LordTagsInventory extends CoreInventory
 					continue;
 				}
 				
-				Tag tag = TagManager.getTag(ids.get(k));
+				Tag tag = tags.get(k);
 				ItemStack item = new ItemStack(Material.NAME_TAG, 1);
 				ItemMeta meta = item.getItemMeta();
 				ArrayList<String> lore = new ArrayList<String>();

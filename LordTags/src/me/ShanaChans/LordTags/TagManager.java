@@ -7,30 +7,24 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.UUID;
-import java.util.stream.Collectors;
-
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import me.ShanaChans.LordTags.Commands.*;
 import me.ShanaChans.LordTags.Inventories.LordTagsInventory;
+import me.ShanaChans.LordTags.Listeners.LuckPermsListener;
 import me.neoblade298.neocore.NeoCore;
 import me.neoblade298.neocore.bungee.BungeeAPI;
 import me.neoblade298.neocore.bungee.PluginMessageEvent;
 import me.neoblade298.neocore.commands.CommandManager;
 import me.neoblade298.neocore.io.IOComponent;
 import me.neoblade298.neocore.util.Util;
-import net.luckperms.api.LuckPerms;
-import net.luckperms.api.model.user.User;
-import net.luckperms.api.model.user.UserManager;
-import net.luckperms.api.node.Node;
 
 public class TagManager extends JavaPlugin implements Listener, IOComponent {
 	private static TagManager inst;
@@ -38,7 +32,7 @@ public class TagManager extends JavaPlugin implements Listener, IOComponent {
 	private static HashMap<UUID, Tag> playerTags = new HashMap<UUID, Tag>();
 	private static ArrayList<String> tagList = new ArrayList<String>();
 	private static HashMap<String, Tag> tagCreation = new HashMap<String, Tag>();
-	private static LuckPerms api;
+	private static HashMap<UUID, ArrayList<Tag>> playerTagCache = new HashMap<UUID, ArrayList<Tag>>();
 	
 	public void onEnable() {
 		Bukkit.getServer().getLogger().info("LordTags Enabled");
@@ -46,7 +40,8 @@ public class TagManager extends JavaPlugin implements Listener, IOComponent {
 		initCommands();
 		NeoCore.registerIOComponent(this, this, "TagManager");
 		inst = this;
-		
+
+		Bukkit.getPluginManager().registerEvents(new LuckPermsListener(), this);
 		try {
 			ResultSet rs = NeoCore.getStatement("TagManager").executeQuery("SELECT * FROM lordtags_tags;");
 			while (rs.next()) {
@@ -57,12 +52,6 @@ public class TagManager extends JavaPlugin implements Listener, IOComponent {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		
-		RegisteredServiceProvider<LuckPerms> provider = Bukkit.getServicesManager().getRegistration(LuckPerms.class);
-        api = null;
-        if (provider != null) {
-            api = provider.getProvider();
-        }
 	}
 	
 	public void onDisable() {
@@ -89,27 +78,25 @@ public class TagManager extends JavaPlugin implements Listener, IOComponent {
 	
 	public static void openTags(Player p)
 	{
-        ArrayList<String> ids = new ArrayList<String>();
-        int tagAmount = 0;
-		if (p.hasPermission("lordtags.tag.*")) {
-			ids = tagList;
-			tagAmount = tagList.size();
+        new LordTagsInventory(p, getCachedTags(p));
+	}
+	
+	public static ArrayList<Tag> getCachedTags(Player p) {
+		UUID uuid = p.getUniqueId();
+		if (playerTagCache.containsKey(p.getUniqueId())) return playerTagCache.get(uuid);
+		
+		ArrayList<Tag> cache = new ArrayList<Tag>();
+		for (String tag : tagList) {
+			if (p.hasPermission("lordtags.tag." + tag)) {
+				cache.add(tags.get(tag));
+			}
 		}
-		else {
-			UserManager mngr = api.getUserManager();
-	        User user = mngr.getUser(p.getName());
-	        ArrayList<Node> tagPerms = (ArrayList<Node>) user.getNodes().stream()
-	                .filter(node -> node.getKey().startsWith("lordtags.tag."))
-	                .filter(node -> TagManager.tagExists(node.getKey().substring(13).toLowerCase()))
-	                .collect(Collectors.toList());
-	        
-	        for(Node node : tagPerms)
-	        {
-        		ids.add(node.getKey().substring(13).toLowerCase());
-            	tagAmount++;
-	        }
-		}
-        new LordTagsInventory(p, tagAmount, ids);
+		playerTagCache.put(p.getUniqueId(), cache);
+		return cache;
+	}
+	
+	public static void removeCache(UUID uuid) {
+		playerTagCache.remove(uuid);
 	}
 	
 	public static TagManager inst() {
