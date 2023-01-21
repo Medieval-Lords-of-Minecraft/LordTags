@@ -18,7 +18,7 @@ import org.bukkit.inventory.meta.SkullMeta;
 import de.tr7zw.nbtapi.NBTItem;
 import me.ShanaChans.LordTags.Tag;
 import me.ShanaChans.LordTags.TagManager;
-import me.neoblade298.neocore.inventories.CoreInventory;
+import me.neoblade298.neocore.bukkit.inventories.CoreInventory;
 import me.neoblade298.neocore.util.Util;
 
 public class LordTagsInventory extends CoreInventory
