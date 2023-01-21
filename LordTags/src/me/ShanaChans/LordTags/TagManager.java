@@ -19,11 +19,11 @@ import org.bukkit.scheduler.BukkitRunnable;
 import me.ShanaChans.LordTags.Commands.*;
 import me.ShanaChans.LordTags.Inventories.LordTagsInventory;
 import me.ShanaChans.LordTags.Listeners.LuckPermsListener;
-import me.neoblade298.neocore.NeoCore;
+import me.neoblade298.neocore.bukkit.NeoCore;
 import me.neoblade298.neocore.bungee.BungeeAPI;
 import me.neoblade298.neocore.bungee.PluginMessageEvent;
-import me.neoblade298.neocore.commands.CommandManager;
-import me.neoblade298.neocore.io.IOComponent;
+import me.neoblade298.neocore.bukkit.commands.CommandManager;
+import me.neoblade298.neocore.bukkit.io.IOComponent;
 import me.neoblade298.neocore.util.Util;
 
 public class TagManager extends JavaPlugin implements Listener, IOComponent {

@@ -4,8 +4,8 @@ import org.bukkit.command.CommandSender;
 
 import me.ShanaChans.LordTags.Tag;
 import me.ShanaChans.LordTags.TagManager;
-import me.neoblade298.neocore.commands.Subcommand;
-import me.neoblade298.neocore.commands.SubcommandRunner;
+import me.neoblade298.neocore.bukkit.commands.Subcommand;
+import me.neoblade298.neocore.bukkit.commands.SubcommandRunner;
 import net.md_5.bungee.api.ChatColor;
 
 public class LordTagsDisplay implements Subcommand
