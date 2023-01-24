@@ -1,5 +1,6 @@
 package me.ShanaChans.LordTags;
 
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -24,7 +25,7 @@ import me.neoblade298.neocore.bukkit.bungee.BungeeAPI;
 import me.neoblade298.neocore.bukkit.bungee.PluginMessageEvent;
 import me.neoblade298.neocore.bukkit.commands.CommandManager;
 import me.neoblade298.neocore.bukkit.io.IOComponent;
-import me.neoblade298.neocore.util.Util;
+import me.neoblade298.neocore.bukkit.util.BukkitUtil;
 
 public class TagManager extends JavaPlugin implements Listener, IOComponent {
 	private static TagManager inst;
@@ -42,8 +43,9 @@ public class TagManager extends JavaPlugin implements Listener, IOComponent {
 		inst = this;
 
 		Bukkit.getPluginManager().registerEvents(new LuckPermsListener(), this);
-		try {
-			ResultSet rs = NeoCore.getStatement("TagManager").executeQuery("SELECT * FROM lordtags_tags;");
+		try (Connection con = NeoCore.getConnection("TagManager");
+				Statement stmt = con.createStatement();
+				ResultSet rs = stmt.executeQuery("SELECT * FROM lordtags_tags;");){
 			while (rs.next()) {
 				Tag tag = new Tag(rs.getString("id"), rs.getString("display"), rs.getString("desc"));
 				tags.put(tag.getId(), tag);
@@ -116,9 +118,10 @@ public class TagManager extends JavaPlugin implements Listener, IOComponent {
 		tags.put(tag.getId(), tag);
 		tagList.add(tag.getId());
 		BungeeAPI.sendPluginMessage("lordtags_newtag", new String[] {tag.getId(), tag.getDisplay(), tag.getDesc()});
-		Util.msg(s, "&7Successfully created tag " + tag.getId());
-		try {
-			NeoCore.getStatement("TagManager").executeUpdate("INSERT INTO lordtags_tags Values('" + tag.getSqlId() + "','"
+		BukkitUtil.msg(s, "&7Successfully created tag " + tag.getId());
+		try (Connection con = NeoCore.getConnection("TagManager");
+				Statement stmt = con.createStatement();){
+			stmt.executeUpdate("INSERT INTO lordtags_tags Values('" + tag.getSqlId() + "','"
 					+ tag.getSqlDisplay() + "','" + tag.getSqlDesc() + "');");
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -131,9 +134,10 @@ public class TagManager extends JavaPlugin implements Listener, IOComponent {
 		tagList.remove(id);
 		
 		BungeeAPI.sendPluginMessage("lordtags_removetag", new String[] {id});
-		Util.msg(s, "&7Successfully removed tag " + id);
-		try {
-			NeoCore.getStatement("TagManager").executeUpdate("DELETE FROM lordtags_tags WHERE id = '" + id + "';");
+		BukkitUtil.msg(s, "&7Successfully removed tag " + id);
+		try (Connection con = NeoCore.getConnection("TagManager");
+				Statement stmt = con.createStatement();){
+			stmt.executeUpdate("DELETE FROM lordtags_tags WHERE id = '" + id + "';");
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -192,9 +196,10 @@ public class TagManager extends JavaPlugin implements Listener, IOComponent {
 	public void loadPlayer(Player p, Statement stmt) {
 		new BukkitRunnable() {
 			public void run() {
-				try {
+				try (Connection con = NeoCore.getConnection("LordTags");
+						Statement late = con.createStatement();) {
 					UUID uuid = p.getUniqueId();
-					ResultSet rs = stmt.executeQuery("SELECT * FROM lordtags_players WHERE uuid = '" + uuid + "';");
+					ResultSet rs = late.executeQuery("SELECT * FROM lordtags_players WHERE uuid = '" + uuid + "';");
 					if (rs.next()) {
 						Tag tag = tags.get(rs.getString("tag"));
 						if (tag != null) {

@@ -6,7 +6,7 @@ import me.ShanaChans.LordTags.Tag;
 import me.ShanaChans.LordTags.TagManager;
 import me.neoblade298.neocore.bukkit.commands.Subcommand;
 import me.neoblade298.neocore.bukkit.commands.SubcommandRunner;
-import me.neoblade298.neocore.util.Util;
+import me.neoblade298.neocore.shared.util.SharedUtil;
 import net.md_5.bungee.api.ChatColor;
 
 public class LordTagsDesc implements Subcommand
@@ -49,7 +49,7 @@ public class LordTagsDesc implements Subcommand
 			}
 			Tag tag = TagManager.getTagCreation().get(author);
 			
-			String desc = Util.connectArgs(args, 0);
+			String desc = SharedUtil.connectArgs(args, 0);
 			
 			tag.setDesc(desc);
 			tag.preview(sender);

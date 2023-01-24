@@ -3,7 +3,7 @@ package me.ShanaChans.LordTags;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 
-import me.neoblade298.neocore.util.Util;
+import me.neoblade298.neocore.shared.util.SharedUtil;
 
 public class Tag implements Comparable<Tag>
 {
@@ -47,7 +47,7 @@ public class Tag implements Comparable<Tag>
 	}
 
 	public void setDisplay(String display) {
-		this.display = Util.translateColors(display);
+		this.display = SharedUtil.translateColors(display);
 		this.sqlDisplay = this.display.replaceAll("'", "\\\\'");
 	}
 

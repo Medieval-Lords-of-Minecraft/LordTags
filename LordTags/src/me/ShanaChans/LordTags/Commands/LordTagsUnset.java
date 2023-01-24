@@ -9,7 +9,7 @@ import me.neoblade298.neocore.bukkit.commands.CommandArgument;
 import me.neoblade298.neocore.bukkit.commands.CommandArguments;
 import me.neoblade298.neocore.bukkit.commands.Subcommand;
 import me.neoblade298.neocore.bukkit.commands.SubcommandRunner;
-import me.neoblade298.neocore.util.Util;
+import me.neoblade298.neocore.bukkit.util.BukkitUtil;
 import net.md_5.bungee.api.ChatColor;
 
 public class LordTagsUnset implements Subcommand
@@ -46,11 +46,11 @@ public class LordTagsUnset implements Subcommand
 		
 		Player p = args.length > 0 ? Bukkit.getPlayer(args[0]) : (Player) sender;
 		if (p == null) {
-			Util.msg(sender, "&cThat player isn't online right now!");
+			BukkitUtil.msg(sender, "&cThat player isn't online right now!");
 			return;
 		}
 		TagManager.removePlayerTag(p);
-		Util.msg(sender, "&7Successfully unset player's tag");
+		BukkitUtil.msg(sender, "&7Successfully unset player's tag");
 	}
 	
 	@Override

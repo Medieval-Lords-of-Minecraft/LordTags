@@ -10,7 +10,7 @@ import me.neoblade298.neocore.bukkit.commands.CommandArgument;
 import me.neoblade298.neocore.bukkit.commands.CommandArguments;
 import me.neoblade298.neocore.bukkit.commands.Subcommand;
 import me.neoblade298.neocore.bukkit.commands.SubcommandRunner;
-import me.neoblade298.neocore.util.Util;
+import me.neoblade298.neocore.bukkit.util.BukkitUtil;
 import net.md_5.bungee.api.ChatColor;
 
 public class LordTagsSet implements Subcommand
@@ -56,21 +56,21 @@ public class LordTagsSet implements Subcommand
 		
 		Tag tag = TagManager.getTag(args[offset].toLowerCase());
 		if (tag == null) {
-			Util.msg(sender, "&cThat tag doesn't exist!");
+			BukkitUtil.msg(sender, "&cThat tag doesn't exist!");
 			return;
 		}
 		
 		if (p == null) {
-			Util.msg(sender, "&cThat player isn't online right now!");
+			BukkitUtil.msg(sender, "&cThat player isn't online right now!");
 			return;
 		}
 		
 		if (!p.hasPermission("lordtags.tag." + tag.getId())) {
-			Util.msg(sender, "&cThat player doesn't have the permission to use that tag!");
+			BukkitUtil.msg(sender, "&cThat player doesn't have the permission to use that tag!");
 			return;
 		}
 		TagManager.setPlayerTag(p, tag);
-		Util.msg(sender, "&7Successfully set player's tag");
+		BukkitUtil.msg(sender, "&7Successfully set player's tag");
 	}
 	
 	@Override

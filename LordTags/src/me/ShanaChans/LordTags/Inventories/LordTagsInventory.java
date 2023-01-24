@@ -19,7 +19,7 @@ import de.tr7zw.nbtapi.NBTItem;
 import me.ShanaChans.LordTags.Tag;
 import me.ShanaChans.LordTags.TagManager;
 import me.neoblade298.neocore.bukkit.inventories.CoreInventory;
-import me.neoblade298.neocore.util.Util;
+import me.neoblade298.neocore.shared.util.SharedUtil;
 
 public class LordTagsInventory extends CoreInventory
 {
@@ -127,7 +127,7 @@ public class LordTagsInventory extends CoreInventory
 					meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
 				}
 				meta.setLore(lore);
-				meta.setDisplayName(Util.translateColors(tag.getDisplay()) + (selected ? "§9 (Selected)" : ""));
+				meta.setDisplayName(SharedUtil.translateColors(tag.getDisplay()) + (selected ? "§9 (Selected)" : ""));
 				meta.setCustomModelData(TAG);
 				item.setItemMeta(meta);
 				NBTItem nbti = new NBTItem(item);
