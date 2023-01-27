@@ -4,42 +4,16 @@ import org.bukkit.command.CommandSender;
 
 import me.ShanaChans.LordTags.Tag;
 import me.ShanaChans.LordTags.TagManager;
-import me.neoblade298.neocore.bukkit.commands.CommandArgument;
-import me.neoblade298.neocore.bukkit.commands.CommandArguments;
+import me.neoblade298.neocore.shared.commands.Arg;
+
 import me.neoblade298.neocore.bukkit.commands.Subcommand;
-import me.neoblade298.neocore.bukkit.commands.SubcommandRunner;
-import net.md_5.bungee.api.ChatColor;
+import me.neoblade298.neocore.shared.commands.SubcommandRunner;
 
-public class LordTagsCreate implements Subcommand
+public class LordTagsCreate extends Subcommand
 {
-	private static final CommandArguments args = new CommandArguments(new CommandArgument("id"));
-	@Override
-	public String getDescription() 
-	{
-		return "Start tag creation";
-	}
-
-	@Override
-	public String getKey() 
-	{
-		return "create";
-	}
-
-	@Override
-	public String getPermission() 
-	{
-		return "lordtags.admin";
-	}
-
-	@Override
-	public SubcommandRunner getRunner() 
-	{
-		return SubcommandRunner.BOTH;
-	}
-	
-	@Override
-	public ChatColor getColor() {
-		return ChatColor.DARK_RED;
+	public LordTagsCreate(String key, String desc, String perm, SubcommandRunner runner) {
+		super(key, desc, perm, runner);
+		args.add(new Arg("id"));
 	}
 
 	@Override
@@ -54,10 +28,5 @@ public class LordTagsCreate implements Subcommand
 		Tag tag = new Tag(args[0]);
 		TagManager.getTagCreation().put(author, tag);
 		tag.preview(sender);
-	}
-	
-	@Override
-	public CommandArguments getArgs() {
-		return args;
 	}
 }

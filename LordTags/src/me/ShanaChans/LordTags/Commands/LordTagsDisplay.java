@@ -5,34 +5,13 @@ import org.bukkit.command.CommandSender;
 import me.ShanaChans.LordTags.Tag;
 import me.ShanaChans.LordTags.TagManager;
 import me.neoblade298.neocore.bukkit.commands.Subcommand;
-import me.neoblade298.neocore.bukkit.commands.SubcommandRunner;
-import net.md_5.bungee.api.ChatColor;
+import me.neoblade298.neocore.shared.commands.SubcommandRunner;
 
-public class LordTagsDisplay implements Subcommand
+public class LordTagsDisplay extends Subcommand
 {
-	@Override
-	public String getDescription() {
-		return "Set tag display";
-	}
-
-	@Override
-	public String getKey() {
-		return "display";
-	}
-
-	@Override
-	public String getPermission() {
-		return "lordtags.admin";
-	}
-	
-	@Override
-	public ChatColor getColor() {
-		return ChatColor.DARK_RED;
-	}
-
-	@Override
-	public SubcommandRunner getRunner() {
-		return SubcommandRunner.BOTH;
+	public LordTagsDisplay(String key, String desc, String perm, SubcommandRunner runner) {
+		super(key, desc, perm, runner);
+		args.setOverride("[Display]");
 	}
 
 	@Override
@@ -54,10 +33,5 @@ public class LordTagsDisplay implements Subcommand
 		
 		tag.setDisplay(display);
 		tag.preview(sender);
-	}
-	
-	@Override
-	public String getArgOverride() {
-		return "[Display]";
 	}
 }

@@ -5,42 +5,22 @@ import org.bukkit.command.CommandSender;
 
 import me.ShanaChans.LordTags.Tag;
 import me.ShanaChans.LordTags.TagManager;
-import me.neoblade298.neocore.bukkit.commands.CommandArgument;
-import me.neoblade298.neocore.bukkit.commands.CommandArguments;
 import me.neoblade298.neocore.bukkit.commands.Subcommand;
-import me.neoblade298.neocore.bukkit.commands.SubcommandRunner;
-import net.md_5.bungee.api.ChatColor;
+import me.neoblade298.neocore.shared.commands.Arg;
 
-public class LordTagsAutopost implements Subcommand
+import me.neoblade298.neocore.shared.commands.SubcommandRunner;
+
+public class LordTagsAutopost extends Subcommand
 {
-	private static final CommandArguments args = new CommandArguments(new CommandArgument("player"));
+	public LordTagsAutopost(String key, String desc, String perm, SubcommandRunner runner) {
+		super(key, desc, perm, runner);
+		args.add(new Arg("player"));
+	}
+
 	@Override
 	public String getDescription() 
 	{
 		return "Automatically finds a usable id and gives the player the tag";
-	}
-
-	@Override
-	public String getKey() 
-	{
-		return "autopost";
-	}
-
-	@Override
-	public String getPermission() 
-	{
-		return "lordtags.admin";
-	}
-	
-	@Override
-	public ChatColor getColor() {
-		return ChatColor.DARK_RED;
-	}
-
-	@Override
-	public SubcommandRunner getRunner() 
-	{
-		return SubcommandRunner.BOTH;
 	}
 
 	@Override
@@ -89,10 +69,5 @@ public class LordTagsAutopost implements Subcommand
 			autoId = tag.getId() + (iter);
 		}
 		Bukkit.getLogger().warning("[LordTags] Auto-creator failed to create id with tag " + tag.getId());
-	}
-	
-	@Override
-	public CommandArguments getArgs() {
-		return args;
 	}
 }

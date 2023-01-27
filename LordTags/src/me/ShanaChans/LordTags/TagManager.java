@@ -23,9 +23,11 @@ import me.ShanaChans.LordTags.Listeners.LuckPermsListener;
 import me.neoblade298.neocore.bukkit.NeoCore;
 import me.neoblade298.neocore.bukkit.bungee.BungeeAPI;
 import me.neoblade298.neocore.bukkit.bungee.PluginMessageEvent;
-import me.neoblade298.neocore.bukkit.commands.CommandManager;
+import me.neoblade298.neocore.bukkit.commands.SubcommandManager;
 import me.neoblade298.neocore.bukkit.io.IOComponent;
-import me.neoblade298.neocore.bukkit.util.BukkitUtil;
+import me.neoblade298.neocore.bukkit.util.Util;
+import me.neoblade298.neocore.shared.commands.SubcommandRunner;
+import net.md_5.bungee.api.ChatColor;
 
 public class TagManager extends JavaPlugin implements Listener, IOComponent {
 	private static TagManager inst;
@@ -62,20 +64,19 @@ public class TagManager extends JavaPlugin implements Listener, IOComponent {
 	}
 	
 	private void initCommands() {
-		CommandManager tags = new CommandManager("tags", this);
-		tags.register(new LordTagsAutopost());
-		tags.register(new LordTagsCreate());
-		tags.register(new LordTagsDesc());
-		tags.register(new LordTagsDisplay());
-		tags.register(new LordTagsId());
-		tags.register(new LordTagsPost());
-		tags.register(new LordTagsExit());
-		tags.register(new LordTagsView());
-		tags.register(new LordTagsCommand());
-		tags.register(new LordTagsSet());
-		tags.register(new LordTagsUnset());
+		SubcommandManager tags = new SubcommandManager("tags", "mycommand.staff", ChatColor.DARK_RED, this);
+		tags.register(new LordTagsAutopost("autopost", "Automatically finds a usable id and gives the player the tag", null, SubcommandRunner.BOTH));
+		tags.register(new LordTagsCreate("create", "Start tag creation", null, SubcommandRunner.BOTH));
+		tags.register(new LordTagsDesc("desc", "Set tag description", null, SubcommandRunner.BOTH));
+		tags.register(new LordTagsDisplay("display", "Set tag display", null, SubcommandRunner.BOTH));
+		tags.register(new LordTagsId("id", "Set tag id", null, SubcommandRunner.BOTH));
+		tags.register(new LordTagsPost("post", "Complete tag creation", null, SubcommandRunner.BOTH));
+		tags.register(new LordTagsExit("exit", "Exit tag creation", null, SubcommandRunner.BOTH));
+		tags.register(new LordTagsView("view", "View existing tag creation", null, SubcommandRunner.BOTH));
+		tags.register(new LordTagsCommand("", "Show all available tags", "lordtags.open", SubcommandRunner.BOTH));
+		tags.register(new LordTagsSet("set", "Start", null, SubcommandRunner.BOTH));
+		tags.register(new LordTagsUnset("unset", "Start", null, SubcommandRunner.BOTH));
 		tags.registerCommandList("help");
-		this.getCommand("tags").setExecutor(tags);
 	}
 	
 	public static void openTags(Player p)
@@ -118,7 +119,7 @@ public class TagManager extends JavaPlugin implements Listener, IOComponent {
 		tags.put(tag.getId(), tag);
 		tagList.add(tag.getId());
 		BungeeAPI.sendPluginMessage("lordtags_newtag", new String[] {tag.getId(), tag.getDisplay(), tag.getDesc()});
-		BukkitUtil.msg(s, "&7Successfully created tag " + tag.getId());
+		Util.msg(s, "&7Successfully created tag " + tag.getId());
 		try (Connection con = NeoCore.getConnection("TagManager");
 				Statement stmt = con.createStatement();){
 			stmt.executeUpdate("INSERT INTO lordtags_tags Values('" + tag.getSqlId() + "','"
@@ -134,7 +135,7 @@ public class TagManager extends JavaPlugin implements Listener, IOComponent {
 		tagList.remove(id);
 		
 		BungeeAPI.sendPluginMessage("lordtags_removetag", new String[] {id});
-		BukkitUtil.msg(s, "&7Successfully removed tag " + id);
+		Util.msg(s, "&7Successfully removed tag " + id);
 		try (Connection con = NeoCore.getConnection("TagManager");
 				Statement stmt = con.createStatement();){
 			stmt.executeUpdate("DELETE FROM lordtags_tags WHERE id = '" + id + "';");

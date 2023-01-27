@@ -3,41 +3,14 @@ package me.ShanaChans.LordTags.Commands;
 import org.bukkit.command.CommandSender;
 
 import me.ShanaChans.LordTags.TagManager;
-import me.neoblade298.neocore.bukkit.commands.CommandArguments;
+
 import me.neoblade298.neocore.bukkit.commands.Subcommand;
-import me.neoblade298.neocore.bukkit.commands.SubcommandRunner;
-import net.md_5.bungee.api.ChatColor;
+import me.neoblade298.neocore.shared.commands.SubcommandRunner;
 
-public class LordTagsExit implements Subcommand
+public class LordTagsExit extends Subcommand
 {
-	private static final CommandArguments args = new CommandArguments();
-	@Override
-	public String getDescription() 
-	{
-		return "Exit out of tag creation";
-	}
-
-	@Override
-	public String getKey() 
-	{
-		return "exit";
-	}
-
-	@Override
-	public String getPermission() 
-	{
-		return "lordtags.admin";
-	}
-
-	@Override
-	public SubcommandRunner getRunner() 
-	{
-		return SubcommandRunner.BOTH;
-	}
-	
-	@Override
-	public ChatColor getColor() {
-		return ChatColor.DARK_RED;
+	public LordTagsExit(String key, String desc, String perm, SubcommandRunner runner) {
+		super(key, desc, perm, runner);
 	}
 
 	@Override
@@ -51,10 +24,5 @@ public class LordTagsExit implements Subcommand
 		}
 		sender.sendMessage("§7You have canceled creating a Tag!");
 		TagManager.getTagCreation().remove(author);
-	}
-	
-	@Override
-	public CommandArguments getArgs() {
-		return args;
 	}
 }

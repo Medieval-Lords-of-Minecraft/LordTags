@@ -4,38 +4,16 @@ import org.bukkit.command.CommandSender;
 
 import me.ShanaChans.LordTags.Tag;
 import me.ShanaChans.LordTags.TagManager;
-import me.neoblade298.neocore.bukkit.commands.CommandArgument;
-import me.neoblade298.neocore.bukkit.commands.CommandArguments;
+import me.neoblade298.neocore.shared.commands.Arg;
+
 import me.neoblade298.neocore.bukkit.commands.Subcommand;
-import me.neoblade298.neocore.bukkit.commands.SubcommandRunner;
-import net.md_5.bungee.api.ChatColor;
+import me.neoblade298.neocore.shared.commands.SubcommandRunner;
 
-public class LordTagsId implements Subcommand
+public class LordTagsId extends Subcommand
 {
-	private static final CommandArguments args = new CommandArguments(new CommandArgument("id"));
-	@Override
-	public String getDescription() {
-		return "Set tag id";
-	}
-
-	@Override
-	public String getKey() {
-		return "id";
-	}
-
-	@Override
-	public String getPermission() {
-		return "lordtags.admin";
-	}
-	
-	@Override
-	public ChatColor getColor() {
-		return ChatColor.DARK_RED;
-	}
-
-	@Override
-	public SubcommandRunner getRunner() {
-		return SubcommandRunner.BOTH;
+	public LordTagsId(String key, String desc, String perm, SubcommandRunner runner) {
+		super(key, desc, perm, runner);
+		args.add(new Arg("id"));
 	}
 
 	@Override
@@ -51,10 +29,5 @@ public class LordTagsId implements Subcommand
 		
 		tag.setId(args[0]);
 		tag.preview(sender);
-	}
-	
-	@Override
-	public CommandArguments getArgs() {
-		return args;
 	}
 }

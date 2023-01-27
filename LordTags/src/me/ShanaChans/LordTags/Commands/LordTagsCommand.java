@@ -4,41 +4,20 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import me.ShanaChans.LordTags.TagManager;
-import me.neoblade298.neocore.bukkit.commands.CommandArguments;
 import me.neoblade298.neocore.bukkit.commands.Subcommand;
-import me.neoblade298.neocore.bukkit.commands.SubcommandRunner;
+import me.neoblade298.neocore.shared.commands.SubcommandRunner;
+import net.md_5.bungee.api.ChatColor;
 
-public class LordTagsCommand implements Subcommand
+public class LordTagsCommand extends Subcommand
 {
-	private static final CommandArguments args = new CommandArguments();
-	@Override
-	public String getDescription() {
-		return "See your tags!";
-	}
-
-	@Override
-	public String getKey() {
-		return "";
-	}
-
-	@Override
-	public String getPermission() {
-		return null;
-	}
-
-	@Override
-	public SubcommandRunner getRunner() {
-		return SubcommandRunner.PLAYER_ONLY;
+	public LordTagsCommand(String key, String desc, String perm, SubcommandRunner runner) {
+		super(key, desc, perm, runner);
+		this.color = ChatColor.RED;
 	}
 
 	@Override
 	public void run(CommandSender sender, String[] args) {
 		Player p = (Player) sender;
 		TagManager.openTags(p);
-	}
-	
-	@Override
-	public CommandArguments getArgs() {
-		return args;
 	}
 }

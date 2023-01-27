@@ -6,39 +6,17 @@ import org.bukkit.entity.Player;
 
 import me.ShanaChans.LordTags.Tag;
 import me.ShanaChans.LordTags.TagManager;
-import me.neoblade298.neocore.bukkit.commands.CommandArgument;
-import me.neoblade298.neocore.bukkit.commands.CommandArguments;
+import me.neoblade298.neocore.shared.commands.Arg;
+
 import me.neoblade298.neocore.bukkit.commands.Subcommand;
-import me.neoblade298.neocore.bukkit.commands.SubcommandRunner;
-import me.neoblade298.neocore.bukkit.util.BukkitUtil;
-import net.md_5.bungee.api.ChatColor;
+import me.neoblade298.neocore.shared.commands.SubcommandRunner;
+import me.neoblade298.neocore.bukkit.util.Util;
 
-public class LordTagsSet implements Subcommand
+public class LordTagsSet extends Subcommand
 {
-	private static final CommandArguments args = new CommandArguments(new CommandArgument("player", false), new CommandArgument("tag id"));
-	@Override
-	public String getDescription() {
-		return "Set the tag for a player";
-	}
-
-	@Override
-	public String getKey() {
-		return "set";
-	}
-
-	@Override
-	public String getPermission() {
-		return "lordtags.admin";
-	}
-	
-	@Override
-	public ChatColor getColor() {
-		return ChatColor.DARK_RED;
-	}
-
-	@Override
-	public SubcommandRunner getRunner() {
-		return SubcommandRunner.BOTH;
+	public LordTagsSet(String key, String desc, String perm, SubcommandRunner runner) {
+		super(key, desc, perm, runner);
+		args.add(new Arg("player", false), new Arg("tag id"));
 	}
 
 	@Override
@@ -56,25 +34,20 @@ public class LordTagsSet implements Subcommand
 		
 		Tag tag = TagManager.getTag(args[offset].toLowerCase());
 		if (tag == null) {
-			BukkitUtil.msg(sender, "&cThat tag doesn't exist!");
+			Util.msg(sender, "&cThat tag doesn't exist!");
 			return;
 		}
 		
 		if (p == null) {
-			BukkitUtil.msg(sender, "&cThat player isn't online right now!");
+			Util.msg(sender, "&cThat player isn't online right now!");
 			return;
 		}
 		
 		if (!p.hasPermission("lordtags.tag." + tag.getId())) {
-			BukkitUtil.msg(sender, "&cThat player doesn't have the permission to use that tag!");
+			Util.msg(sender, "&cThat player doesn't have the permission to use that tag!");
 			return;
 		}
 		TagManager.setPlayerTag(p, tag);
-		BukkitUtil.msg(sender, "&7Successfully set player's tag");
-	}
-	
-	@Override
-	public CommandArguments getArgs() {
-		return args;
+		Util.msg(sender, "&7Successfully set player's tag");
 	}
 }
