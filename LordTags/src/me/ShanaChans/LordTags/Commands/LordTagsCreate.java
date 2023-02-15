@@ -8,12 +8,14 @@ import me.neoblade298.neocore.shared.commands.Arg;
 
 import me.neoblade298.neocore.bukkit.commands.Subcommand;
 import me.neoblade298.neocore.shared.commands.SubcommandRunner;
+import me.neoblade298.neocore.shared.util.SharedUtil;
 
 public class LordTagsCreate extends Subcommand
 {
 	public LordTagsCreate(String key, String desc, String perm, SubcommandRunner runner) {
 		super(key, desc, perm, runner);
 		args.add(new Arg("id"));
+		args.setMax(-1);
 	}
 
 	@Override
@@ -25,7 +27,8 @@ public class LordTagsCreate extends Subcommand
 			sender.sendMessage("§7You are already creating a Tag!");
 			return;
 		}
-		Tag tag = new Tag(args[0]);
+		String id = SharedUtil.connectArgs(args, 1).replaceAll(" ", "");
+		Tag tag = new Tag(id);
 		TagManager.getTagCreation().put(author, tag);
 		tag.preview(sender);
 	}
