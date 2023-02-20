@@ -37,8 +37,10 @@ public class TagManager extends JavaPlugin implements Listener, IOComponent {
 	private static TagManager inst;
 	private static HashMap<String, Tag> tags = new HashMap<String, Tag>();
 	private static HashMap<UUID, Tag> playerTags = new HashMap<UUID, Tag>();
+	private static HashMap<UUID, String> playerDisplays = new HashMap<UUID, String>();
 	private static HashMap<UUID, String> playerNicks = new HashMap<UUID, String>();
 	private static HashMap<UUID, Gradient> nameGradients = new HashMap<UUID, Gradient>();
+	private static HashMap<UUID, ChatColor> nameColors = new HashMap<UUID, ChatColor>();
 	private static ArrayList<String> tagList = new ArrayList<String>();
 	private static HashMap<String, Tag> tagCreation = new HashMap<String, Tag>();
 	private static HashMap<UUID, ArrayList<Tag>> playerTagCache = new HashMap<UUID, ArrayList<Tag>>();
@@ -93,8 +95,16 @@ public class TagManager extends JavaPlugin implements Listener, IOComponent {
 		SubcommandManager nick = new SubcommandManager("nick", "lordtags.nick", null, this);
 		nick.register(new CmdNick("", "Sets your nickname", null, SubcommandRunner.BOTH));
 
-		SubcommandManager gradient = new SubcommandManager("nick", "lordtags.gradient", null, this);
+		SubcommandManager gradient = new SubcommandManager("gradients", "lordtags.gradient", null, this);
 		gradient.register(new CmdGradient("", "Opens the gradient picker", null, SubcommandRunner.PLAYER_ONLY));
+		gradient.register(new CmdGradientSet("set", "Sets a player's gradient", "lordtags.admin", SubcommandRunner.BOTH));
+		gradient.register(new CmdGradientUnset("unset", "Unsets a player's gradient", "lordtags.admin", SubcommandRunner.BOTH));
+		gradient.registerCommandList("help");
+		
+		SubcommandManager namecolors = new SubcommandManager("namecolors", "lordtags.namecolors", null, this);
+		namecolors.register(new CmdNamecolor("", "Opens the color picker", null, SubcommandRunner.PLAYER_ONLY));
+		namecolors.register(new CmdNamecolorSet("set", "Sets a player's color", "lordtags.admin", SubcommandRunner.BOTH));
+		namecolors.register(new CmdNamecolorUnset("unset", "Unsets a player's color", "lordtags.admin", SubcommandRunner.BOTH));
 	}
 	
 	public static void openTags(Player p)
@@ -168,7 +178,7 @@ public class TagManager extends JavaPlugin implements Listener, IOComponent {
 	}
 	
 	public static String getPlayerNick(Player p) {
-		return playerNicks.getOrDefault(p.getUniqueId(), p.getName());
+		return playerNicks.get(p.getUniqueId());
 	}
 	
 	public static void setPlayerTag(Player p, Tag tag) {
@@ -220,6 +230,7 @@ public class TagManager extends JavaPlugin implements Listener, IOComponent {
 
 	@Override
 	public void loadPlayer(Player p, Statement stmt) {
+		playerDisplays.put(p.getUniqueId(), p.getName());
 		BukkitRunnable runnable = new BukkitRunnable() {
 			public void run() {
 				UUID uuid = p.getUniqueId();
@@ -233,10 +244,6 @@ public class TagManager extends JavaPlugin implements Listener, IOComponent {
 					}
 				}
 				
-				if (pfields.exists("nick", uuid)) {
-					playerNicks.put(uuid, (String) pfields.getValue(uuid, "nick"));
-				}
-				
 				if (pfields.exists("namegradient", uuid)) {
 					Gradient gradient = GradientManager.get((String) (pfields.getValue(uuid, "namegradient")));
 					if (gradient != null) {
@@ -246,6 +253,14 @@ public class TagManager extends JavaPlugin implements Listener, IOComponent {
 						Bukkit.getLogger().warning("[LordTags] Failed to load gradient " + pfields.getValue(uuid, "gradient") + " for player " + p.getName());
 					}
 				}
+				else if (pfields.exists("namecolor", uuid)) {
+					nameColors.put(uuid, ChatColor.of((String) pfields.getValue(uuid, "namecolor")));
+				}
+				
+				if (pfields.exists("nick", uuid)) {
+					setPlayerNick(p, (String) pfields.getValue(uuid, "nick"));
+				}
+				calculatePlayerDisplay(p);
 			}
 		};
 		NeoCore.addPostIORunnable(runnable, IOType.LOAD, p.getUniqueId(), false);
@@ -258,22 +273,57 @@ public class TagManager extends JavaPlugin implements Listener, IOComponent {
 	public void savePlayer(Player p, Statement insert, Statement delete) {} // All saving handled by NeoCore
 	
 	public static void setPlayerNick(Player p, String nick) {
-		playerNicks.put(p.getUniqueId(), nick);
+		UUID uuid = p.getUniqueId();
+		playerNicks.put(uuid, nick);
+		calculatePlayerDisplay(p);
 	}
 	
-	public static String removePlayerNick(Player p) {
-		return playerNicks.remove(p.getUniqueId());
+	public static void removePlayerNick(Player p) {
+		playerNicks.remove(p.getUniqueId());
+		calculatePlayerDisplay(p);
 	}
 	
 	public static void setNameGradient(Player p, Gradient gradient) {
 		nameGradients.put(p.getUniqueId(), gradient);
+		calculatePlayerDisplay(p);
 	}
 	
-	public static Gradient removeNameGradient(Player p) {
-		return nameGradients.remove(p.getUniqueId());
+	public static void calculatePlayerDisplay(Player p) {
+		UUID uuid = p.getUniqueId();
+		String name = playerNicks.getOrDefault(uuid, p.getName());
+		if (nameGradients.containsKey(uuid)) {
+			playerDisplays.put(uuid, nameGradients.get(uuid).apply(name));
+		}
+		else if (nameColors.containsKey(uuid)) {
+			name = nameColors.get(uuid) + name;
+		}
+		playerDisplays.put(uuid, name);
+	}
+	
+	public static void removeNameGradient(Player p) {
+		nameGradients.remove(p.getUniqueId());
+		calculatePlayerDisplay(p);
 	}
 	
 	public static Gradient getNameGradient(Player p) {
 		return nameGradients.get(p.getUniqueId());
+	}
+	
+	public static void setNameColor(Player p, ChatColor color) {
+		nameColors.put(p.getUniqueId(), color);
+		calculatePlayerDisplay(p);
+	}
+	
+	public static ChatColor getNameColor(Player p) {
+		return nameColors.get(p.getUniqueId());
+	}
+	
+	public static void removeNameColor(Player p) {
+		nameColors.remove(p.getUniqueId());
+		calculatePlayerDisplay(p);
+	}
+	
+	public static String getPlayerDisplay(Player p) {
+		return playerDisplays.getOrDefault(p.getUniqueId(), p.getName());
 	}
 }

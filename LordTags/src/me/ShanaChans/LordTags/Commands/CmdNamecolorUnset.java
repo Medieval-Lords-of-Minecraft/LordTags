@@ -12,9 +12,9 @@ import me.neoblade298.neocore.shared.commands.SubcommandRunner;
 import net.md_5.bungee.api.ChatColor;
 import me.neoblade298.neocore.bukkit.util.Util;
 
-public class CmdGradientUnset extends Subcommand
+public class CmdNamecolorUnset extends Subcommand
 {
-	public CmdGradientUnset(String key, String desc, String perm, SubcommandRunner runner) {
+	public CmdNamecolorUnset(String key, String desc, String perm, SubcommandRunner runner) {
 		super(key, desc, perm, runner);
 		color = ChatColor.DARK_RED;
 		args.add(new Arg("player", false));
@@ -29,7 +29,7 @@ public class CmdGradientUnset extends Subcommand
 			Util.msg(sender, "&cThat player isn't online right now!");
 			return;
 		}
-		TagManager.removeNameGradient(p);
-		Util.msg(sender, "&7Successfully unset player's gradient");
+		TagManager.removeNameColor(p);
+		Util.msg(sender, "&7Successfully unset player's color");
 	}
 }

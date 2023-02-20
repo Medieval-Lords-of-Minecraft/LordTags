@@ -148,7 +148,7 @@ public class GradientInventory extends CoreInventory
 				
 				ItemStack item = icons[k];
 				NBTItem nbti = new NBTItem(item);
-				if (nbti.getString("gradient").equals(curr.getId())) {
+				if (curr != null && nbti.getString("gradient").equals(curr.getId())) {
 					contents[(10 + 9*i) + j] = setupCurrentIcon(curr);
 				}
 				else {
@@ -196,7 +196,7 @@ public class GradientInventory extends CoreInventory
 		else if(isGradient(e.getCurrentItem()))
 		{
 			NBTItem nbti = new NBTItem(e.getCurrentItem());
-			String id = nbti.getString("id");
+			String id = nbti.getString("gradient");
 			if (e.getCurrentItem().containsEnchantment(Enchantment.LUCK)) {
 				TagManager.removeNameGradient((Player) e.getWhoClicked());
 			}

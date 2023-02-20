@@ -11,12 +11,14 @@ import me.neoblade298.neocore.bukkit.commands.Subcommand;
 import me.neoblade298.neocore.shared.commands.SubcommandRunner;
 import me.neoblade298.neocore.shared.util.Gradient;
 import me.neoblade298.neocore.shared.util.GradientManager;
+import net.md_5.bungee.api.ChatColor;
 import me.neoblade298.neocore.bukkit.util.Util;
 
 public class CmdGradientSet extends Subcommand
 {
 	public CmdGradientSet(String key, String desc, String perm, SubcommandRunner runner) {
 		super(key, desc, perm, runner);
+		color = ChatColor.DARK_RED;
 		args.add(new Arg("player", false), new Arg("gradient id"));
 	}
 
