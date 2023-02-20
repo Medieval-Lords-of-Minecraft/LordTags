@@ -10,9 +10,9 @@ import me.neoblade298.neocore.shared.commands.Arg;
 
 import me.neoblade298.neocore.shared.commands.SubcommandRunner;
 
-public class LordTagsAutopost extends Subcommand
+public class CmdTagsAutopost extends Subcommand
 {
-	public LordTagsAutopost(String key, String desc, String perm, SubcommandRunner runner) {
+	public CmdTagsAutopost(String key, String desc, String perm, SubcommandRunner runner) {
 		super(key, desc, perm, runner);
 		args.add(new Arg("player"));
 	}

@@ -7,9 +7,9 @@ import me.ShanaChans.LordTags.TagManager;
 import me.neoblade298.neocore.bukkit.commands.Subcommand;
 import me.neoblade298.neocore.shared.commands.SubcommandRunner;
 
-public class LordTagsExit extends Subcommand
+public class CmdTagsExit extends Subcommand
 {
-	public LordTagsExit(String key, String desc, String perm, SubcommandRunner runner) {
+	public CmdTagsExit(String key, String desc, String perm, SubcommandRunner runner) {
 		super(key, desc, perm, runner);
 	}
 

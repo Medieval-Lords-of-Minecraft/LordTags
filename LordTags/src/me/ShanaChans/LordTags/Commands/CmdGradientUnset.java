@@ -11,9 +11,9 @@ import me.neoblade298.neocore.bukkit.commands.Subcommand;
 import me.neoblade298.neocore.shared.commands.SubcommandRunner;
 import me.neoblade298.neocore.bukkit.util.Util;
 
-public class LordTagsUnset extends Subcommand
+public class CmdGradientUnset extends Subcommand
 {
-	public LordTagsUnset(String key, String desc, String perm, SubcommandRunner runner) {
+	public CmdGradientUnset(String key, String desc, String perm, SubcommandRunner runner) {
 		super(key, desc, perm, runner);
 		args.add(new Arg("player", false));
 	}
@@ -27,7 +27,7 @@ public class LordTagsUnset extends Subcommand
 			Util.msg(sender, "&cThat player isn't online right now!");
 			return;
 		}
-		TagManager.removePlayerTag(p);
-		Util.msg(sender, "&7Successfully unset player's tag");
+		TagManager.removeNameGradient(p);
+		Util.msg(sender, "&7Successfully unset player's gradient");
 	}
 }

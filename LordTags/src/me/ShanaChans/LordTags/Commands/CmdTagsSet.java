@@ -12,9 +12,9 @@ import me.neoblade298.neocore.bukkit.commands.Subcommand;
 import me.neoblade298.neocore.shared.commands.SubcommandRunner;
 import me.neoblade298.neocore.bukkit.util.Util;
 
-public class LordTagsSet extends Subcommand
+public class CmdTagsSet extends Subcommand
 {
-	public LordTagsSet(String key, String desc, String perm, SubcommandRunner runner) {
+	public CmdTagsSet(String key, String desc, String perm, SubcommandRunner runner) {
 		super(key, desc, perm, runner);
 		args.add(new Arg("player", false), new Arg("tag id"));
 	}

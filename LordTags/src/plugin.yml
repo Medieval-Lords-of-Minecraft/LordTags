@@ -8,4 +8,10 @@ commands:
    tags:
       description: See all your tags!
       usage: /tags
+   nick:
+      description: Give yourself a nickname!
+      usage: /nick
+   gradients:
+      description: Choose a gradient for your name!
+      usage: /gradient
    

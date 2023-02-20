@@ -8,26 +8,28 @@ import me.neoblade298.neocore.shared.commands.Arg;
 
 import me.neoblade298.neocore.bukkit.commands.Subcommand;
 import me.neoblade298.neocore.shared.commands.SubcommandRunner;
+import me.neoblade298.neocore.shared.util.SharedUtil;
 
-public class LordTagsId extends Subcommand
+public class CmdTagsCreate extends Subcommand
 {
-	public LordTagsId(String key, String desc, String perm, SubcommandRunner runner) {
+	public CmdTagsCreate(String key, String desc, String perm, SubcommandRunner runner) {
 		super(key, desc, perm, runner);
 		args.add(new Arg("id"));
+		args.setMax(-1);
 	}
 
 	@Override
 	public void run(CommandSender sender, String[] args) 
 	{
 		String author = sender.getName();
-		if(!TagManager.getTagCreation().containsKey(author))
+		if(TagManager.getTagCreation().containsKey(author))
 		{
-			sender.sendMessage("§7You are not creating a Tag!");
+			sender.sendMessage("§7You are already creating a Tag!");
 			return;
 		}
-		Tag tag = TagManager.getTagCreation().get(author);
-		
-		tag.setId(args[0]);
+		String id = SharedUtil.connectArgs(args, 1).replaceAll(" ", "");
+		Tag tag = new Tag(id);
+		TagManager.getTagCreation().put(author, tag);
 		tag.preview(sender);
 	}
 }

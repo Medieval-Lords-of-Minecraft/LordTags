@@ -8,9 +8,9 @@ import me.neoblade298.neocore.bukkit.commands.Subcommand;
 import me.neoblade298.neocore.shared.commands.SubcommandRunner;
 import me.neoblade298.neocore.shared.util.SharedUtil;
 
-public class LordTagsDesc extends Subcommand
+public class CmdTagsDesc extends Subcommand
 {
-	public LordTagsDesc(String key, String desc, String perm, SubcommandRunner runner) {
+	public CmdTagsDesc(String key, String desc, String perm, SubcommandRunner runner) {
 		super(key, desc, perm, runner);
 		args.setOverride("[Description]");
 	}

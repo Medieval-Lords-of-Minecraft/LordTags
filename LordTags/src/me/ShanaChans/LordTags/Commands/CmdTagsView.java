@@ -8,9 +8,9 @@ import me.ShanaChans.LordTags.TagManager;
 import me.neoblade298.neocore.bukkit.commands.Subcommand;
 import me.neoblade298.neocore.shared.commands.SubcommandRunner;
 
-public class LordTagsPost extends Subcommand
+public class CmdTagsView extends Subcommand
 {
-	public LordTagsPost(String key, String desc, String perm, SubcommandRunner runner) {
+	public CmdTagsView(String key, String desc, String perm, SubcommandRunner runner) {
 		super(key, desc, perm, runner);
 	}
 
@@ -23,22 +23,7 @@ public class LordTagsPost extends Subcommand
 			sender.sendMessage("§7You are not creating a Tag!");
 			return;
 		}
-		
 		Tag tag = TagManager.getTagCreation().get(author);
-		
-		if(!tag.isFilled())
-		{
-			sender.sendMessage("§7You must fill all parts of a Tag!");
-			return;
-		}
-		
-		if(TagManager.tagExists(tag.getId()))
-		{
-			sender.sendMessage("§7Tag with this Id already exists!");
-			return;
-		}
-		
-		tag.post(sender, tag);
-		TagManager.getTagCreation().remove(author);
+		tag.preview(sender);
 	}
 }

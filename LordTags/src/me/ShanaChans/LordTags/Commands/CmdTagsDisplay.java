@@ -7,9 +7,9 @@ import me.ShanaChans.LordTags.TagManager;
 import me.neoblade298.neocore.bukkit.commands.Subcommand;
 import me.neoblade298.neocore.shared.commands.SubcommandRunner;
 
-public class LordTagsDisplay extends Subcommand
+public class CmdTagsDisplay extends Subcommand
 {
-	public LordTagsDisplay(String key, String desc, String perm, SubcommandRunner runner) {
+	public CmdTagsDisplay(String key, String desc, String perm, SubcommandRunner runner) {
 		super(key, desc, perm, runner);
 		args.setOverride("[Display]");
 	}

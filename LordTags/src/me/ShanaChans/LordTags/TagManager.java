@@ -25,24 +25,36 @@ import me.neoblade298.neocore.bukkit.bungee.BungeeAPI;
 import me.neoblade298.neocore.bukkit.bungee.PluginMessageEvent;
 import me.neoblade298.neocore.bukkit.commands.SubcommandManager;
 import me.neoblade298.neocore.bukkit.io.IOComponent;
+import me.neoblade298.neocore.bukkit.io.IOType;
+import me.neoblade298.neocore.bukkit.player.PlayerFields;
 import me.neoblade298.neocore.bukkit.util.Util;
 import me.neoblade298.neocore.shared.commands.SubcommandRunner;
+import me.neoblade298.neocore.shared.util.Gradient;
+import me.neoblade298.neocore.shared.util.GradientManager;
 import net.md_5.bungee.api.ChatColor;
 
 public class TagManager extends JavaPlugin implements Listener, IOComponent {
 	private static TagManager inst;
 	private static HashMap<String, Tag> tags = new HashMap<String, Tag>();
 	private static HashMap<UUID, Tag> playerTags = new HashMap<UUID, Tag>();
+	private static HashMap<UUID, String> playerNicks = new HashMap<UUID, String>();
+	private static HashMap<UUID, Gradient> nameGradients = new HashMap<UUID, Gradient>();
 	private static ArrayList<String> tagList = new ArrayList<String>();
 	private static HashMap<String, Tag> tagCreation = new HashMap<String, Tag>();
 	private static HashMap<UUID, ArrayList<Tag>> playerTagCache = new HashMap<UUID, ArrayList<Tag>>();
 	
+	private static PlayerFields pfields;
+	
 	public void onEnable() {
+		inst = this;
 		Bukkit.getServer().getLogger().info("LordTags Enabled");
 		Bukkit.getPluginManager().registerEvents(this, this);
 		initCommands();
 		NeoCore.registerIOComponent(this, this, "TagManager");
-		inst = this;
+		pfields = NeoCore.createPlayerFields("lordtags", this, true);
+		pfields.initializeField("tag", "");
+		pfields.initializeField("nick", "");
+		pfields.initializeField("namegradient", "");
 
 		Bukkit.getPluginManager().registerEvents(new LuckPermsListener(), this);
 		try (Connection con = NeoCore.getConnection("TagManager");
@@ -65,18 +77,24 @@ public class TagManager extends JavaPlugin implements Listener, IOComponent {
 	
 	private void initCommands() {
 		SubcommandManager tags = new SubcommandManager("tags", "mycommand.staff", ChatColor.DARK_RED, this);
-		tags.register(new LordTagsAutopost("autopost", "Automatically finds a usable id and gives the player the tag", null, SubcommandRunner.BOTH));
-		tags.register(new LordTagsCreate("create", "Start tag creation", null, SubcommandRunner.BOTH));
-		tags.register(new LordTagsDesc("desc", "Set tag description", null, SubcommandRunner.BOTH));
-		tags.register(new LordTagsDisplay("display", "Set tag display", null, SubcommandRunner.BOTH));
-		tags.register(new LordTagsId("id", "Set tag id", null, SubcommandRunner.BOTH));
-		tags.register(new LordTagsPost("post", "Complete tag creation", null, SubcommandRunner.BOTH));
-		tags.register(new LordTagsExit("exit", "Exit tag creation", null, SubcommandRunner.BOTH));
-		tags.register(new LordTagsView("view", "View existing tag creation", null, SubcommandRunner.BOTH));
-		tags.register(new LordTagsCommand("", "Show all available tags", "lordtags.open", SubcommandRunner.BOTH));
-		tags.register(new LordTagsSet("set", "Start", null, SubcommandRunner.BOTH));
-		tags.register(new LordTagsUnset("unset", "Start", null, SubcommandRunner.BOTH));
+		tags.register(new CmdTagsAutopost("autopost", "Automatically finds a usable id and gives the player the tag", null, SubcommandRunner.BOTH));
+		tags.register(new CmdTagsCreate("create", "Start tag creation", null, SubcommandRunner.BOTH));
+		tags.register(new CmdTagsDesc("desc", "Set tag description", null, SubcommandRunner.BOTH));
+		tags.register(new CmdTagsDisplay("display", "Set tag display", null, SubcommandRunner.BOTH));
+		tags.register(new CmdTagsId("id", "Set tag id", null, SubcommandRunner.BOTH));
+		tags.register(new CmdTagsPost("post", "Complete tag creation", null, SubcommandRunner.BOTH));
+		tags.register(new CmdTagsExit("exit", "Exit tag creation", null, SubcommandRunner.BOTH));
+		tags.register(new CmdTagsView("view", "View existing tag creation", null, SubcommandRunner.BOTH));
+		tags.register(new CmdTags("", "Show all available tags", "lordtags.open", SubcommandRunner.BOTH));
+		tags.register(new CmdTagsSet("set", "Start", null, SubcommandRunner.BOTH));
+		tags.register(new CmdTagsUnset("unset", "Start", null, SubcommandRunner.BOTH));
 		tags.registerCommandList("help");
+		
+		SubcommandManager nick = new SubcommandManager("nick", "lordtags.nick", null, this);
+		nick.register(new CmdNick("", "Sets your nickname", null, SubcommandRunner.BOTH));
+
+		SubcommandManager gradient = new SubcommandManager("nick", "lordtags.gradient", null, this);
+		gradient.register(new CmdGradient("", "Opens the gradient picker", null, SubcommandRunner.PLAYER_ONLY));
 	}
 	
 	public static void openTags(Player p)
@@ -149,8 +167,13 @@ public class TagManager extends JavaPlugin implements Listener, IOComponent {
 		return playerTags.get(p.getUniqueId());
 	}
 	
+	public static String getPlayerNick(Player p) {
+		return playerNicks.getOrDefault(p.getUniqueId(), p.getName());
+	}
+	
 	public static void setPlayerTag(Player p, Tag tag) {
 		playerTags.put(p.getUniqueId(), tag);
+		pfields.changeField("tag", tag.getId(), p.getUniqueId());
 	}
 	
 	public static void setPlayerTag(Player p, String id) {
@@ -159,6 +182,7 @@ public class TagManager extends JavaPlugin implements Listener, IOComponent {
 	
 	public static void removePlayerTag(Player p) {
 		playerTags.remove(p.getUniqueId());
+		pfields.resetField("tag", p.getUniqueId());
 	}
 
 	public static HashMap<String, Tag> getTagCreation() {
@@ -169,6 +193,7 @@ public class TagManager extends JavaPlugin implements Listener, IOComponent {
 		for (Entry<UUID, Tag> e : playerTags.entrySet()) {
 			if (e.getValue().getId().equalsIgnoreCase(id)) {
 				playerTags.remove(e.getKey());
+				pfields.resetField("tag", e.getKey());
 			}
 		}
 	}
@@ -195,45 +220,60 @@ public class TagManager extends JavaPlugin implements Listener, IOComponent {
 
 	@Override
 	public void loadPlayer(Player p, Statement stmt) {
-		new BukkitRunnable() {
+		BukkitRunnable runnable = new BukkitRunnable() {
 			public void run() {
-				try (Connection con = NeoCore.getConnection("LordTags");
-						Statement late = con.createStatement();) {
-					UUID uuid = p.getUniqueId();
-					ResultSet rs = late.executeQuery("SELECT * FROM lordtags_players WHERE uuid = '" + uuid + "';");
-					if (rs.next()) {
-						Tag tag = tags.get(rs.getString("tag"));
-						if (tag != null) {
-							playerTags.put(uuid, tag);
-						}
-						else {
-							Bukkit.getLogger().warning("[LordTags] Failed to load tag " + rs.getString("tag") + " for player " + p.getName());
-						}
+				UUID uuid = p.getUniqueId();
+				if (pfields.exists("tag", uuid)) {
+					Tag tag = tags.get(pfields.getValue(uuid, "tag"));
+					if (tag != null) {
+						playerTags.put(uuid, tag);
 					}
-				} catch (SQLException e) {
-					e.printStackTrace();
+					else {
+						Bukkit.getLogger().warning("[LordTags] Failed to load tag " + pfields.getValue(uuid, "tag") + " for player " + p.getName());
+					}
+				}
+				
+				if (pfields.exists("nick", uuid)) {
+					playerNicks.put(uuid, (String) pfields.getValue(uuid, "nick"));
+				}
+				
+				if (pfields.exists("namegradient", uuid)) {
+					Gradient gradient = GradientManager.get((String) (pfields.getValue(uuid, "namegradient")));
+					if (gradient != null) {
+						nameGradients.put(uuid, gradient);
+					}
+					else {
+						Bukkit.getLogger().warning("[LordTags] Failed to load gradient " + pfields.getValue(uuid, "gradient") + " for player " + p.getName());
+					}
 				}
 			}
-		}.runTaskLaterAsynchronously(this, 20L);
+		};
+		NeoCore.addPostIORunnable(runnable, IOType.LOAD, p.getUniqueId(), false);
 	}
 
 	@Override
 	public void preloadPlayer(OfflinePlayer p, Statement stmt) {}
 
 	@Override
-	public void savePlayer(Player p, Statement insert, Statement delete) {
-		try {
-			UUID uuid = p.getUniqueId();
-			if (playerTags.containsKey(uuid)) {
-				Tag tag = playerTags.get(uuid);
-				insert.executeUpdate("REPLACE INTO lordtags_players VALUES ('" + 
-						uuid + "','" + tag.getSqlId() + "');");
-			}
-			else {
-				delete.executeUpdate("DELETE FROM lordtags_players WHERE uuid = '" + uuid + "';");
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+	public void savePlayer(Player p, Statement insert, Statement delete) {} // All saving handled by NeoCore
+	
+	public static void setPlayerNick(Player p, String nick) {
+		playerNicks.put(p.getUniqueId(), nick);
+	}
+	
+	public static String removePlayerNick(Player p) {
+		return playerNicks.remove(p.getUniqueId());
+	}
+	
+	public static void setNameGradient(Player p, Gradient gradient) {
+		nameGradients.put(p.getUniqueId(), gradient);
+	}
+	
+	public static Gradient removeNameGradient(Player p) {
+		return nameGradients.remove(p.getUniqueId());
+	}
+	
+	public static Gradient getNameGradient(Player p) {
+		return nameGradients.get(p.getUniqueId());
 	}
 }
