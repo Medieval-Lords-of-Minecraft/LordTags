@@ -62,15 +62,13 @@ public class TagManager extends JavaPlugin implements Listener, IOComponent {
 		pfields.initializeField("tag", "");
 		pfields.initializeField("nick", "");
 		pfields.initializeField("namegradient", "");
-		pfields.initializeField("namecolor", "");
-		pfields.initializeField("chatcolor", "");
 
 		Bukkit.getPluginManager().registerEvents(new LuckPermsListener(), this);
 		try (Connection con = NeoCore.getConnection("TagManager");
 				Statement stmt = con.createStatement();
 				ResultSet rs = stmt.executeQuery("SELECT * FROM lordtags_tags;");) {
 			while (rs.next()) {
-				Tag tag = new Tag(rs.getString("id"), rs.getString("display"), rs.getString("desc"));
+				Tag tag = new Tag(rs.getString("id"), rs.getString("display"), rs.getString("desc"), rs.getString("gradient"));
 				tags.put(tag.getId(), tag);
 				tagList.add(tag.getId());
 			}
@@ -82,6 +80,8 @@ public class TagManager extends JavaPlugin implements Listener, IOComponent {
 			gradientList.add(g.getId());
 		}
 		Collections.sort(gradientList);
+		
+		load();
 	}
 	
 	public static void load() {
@@ -124,6 +124,7 @@ public class TagManager extends JavaPlugin implements Listener, IOComponent {
 		tags.register(new CmdTagsCreate("create", "Start tag creation", null, SubcommandRunner.BOTH));
 		tags.register(new CmdTagsDesc("desc", "Set tag description", null, SubcommandRunner.BOTH));
 		tags.register(new CmdTagsDisplay("display", "Set tag display", null, SubcommandRunner.BOTH));
+		tags.register(new CmdTagsDisplay("gradient", "Set tag gradient", null, SubcommandRunner.BOTH));
 		tags.register(new CmdTagsId("id", "Set tag id", null, SubcommandRunner.BOTH));
 		tags.register(new CmdTagsPost("post", "Complete tag creation", null, SubcommandRunner.BOTH));
 		tags.register(new CmdTagsExit("exit", "Exit tag creation", null, SubcommandRunner.BOTH));
@@ -194,14 +195,15 @@ public class TagManager extends JavaPlugin implements Listener, IOComponent {
 	public static void createTag(CommandSender s, Tag tag) {
 		tags.put(tag.getId(), tag);
 		tagList.add(tag.getId());
-		BungeeAPI.sendPluginMessage("lordtags_newtag", new String[] { tag.getId(), tag.getDisplay(), tag.getDesc() });
-		Util.msg(s, "&7Successfully created tag " + tag.getId());
+		String gradientSql = tag.getGradient() != null ? "'" + tag.getGradient() + "'" : "null";
+		BungeeAPI.sendPluginMessage("lordtags_newtag", new String[] { tag.getId(), tag.getDisplay(), tag.getDesc(), tag.getGradient() });
 		try (Connection con = NeoCore.getConnection("TagManager"); Statement stmt = con.createStatement();) {
 			stmt.executeUpdate("INSERT INTO lordtags_tags Values('" + tag.getSqlId() + "','" + tag.getSqlDisplay()
-					+ "','" + tag.getSqlDesc() + "');");
+					+ "','" + tag.getSqlDesc() + "'," + gradientSql + ");");
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+		Util.msg(s, "&7Successfully created tag " + tag.getId());
 	}
 
 	// Only called by command to avoid endless pluginmsg loop
@@ -234,7 +236,7 @@ public class TagManager extends JavaPlugin implements Listener, IOComponent {
 	public void onPluginMessage(PluginMessageEvent e) {
 		if (e.getChannel().equals("lordtags_newtag")) {
 			ArrayList<String> msgs = e.getMessages();
-			Tag tag = new Tag(msgs.get(0), msgs.get(1), msgs.get(2));
+			Tag tag = new Tag(msgs.get(0), msgs.get(1), msgs.get(2), msgs.get(3));
 			tags.put(tag.getId(), tag);
 			tagList.add(tag.getId());
 			Bukkit.getLogger().info("[LordTags] Received plugin message to add tag " + tag.getId());

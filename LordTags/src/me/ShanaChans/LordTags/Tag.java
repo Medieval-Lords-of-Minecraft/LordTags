@@ -3,11 +3,12 @@ package me.ShanaChans.LordTags;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 
+import me.neoblade298.neocore.shared.util.GradientManager;
 import me.neoblade298.neocore.shared.util.SharedUtil;
 
 public class Tag implements Comparable<Tag>
 {
-	private String id, display, desc, sqlId, sqlDisplay, sqlDesc;
+	private String id, display, desc, sqlId, sqlDisplay, sqlDesc, gradient;
 	
 	public Tag(String id)
 	{
@@ -15,14 +16,13 @@ public class Tag implements Comparable<Tag>
 		this.sqlId = this.id.replaceAll("'", "''");
 	}
 	
-	public Tag(String id, String display, String desc)
+	// No need for sql-parsed stuff because this won't ever go to sql again
+	public Tag(String id, String display, String desc, String gradient)
 	{
 		this.id = id.toLowerCase();
-		this.sqlId = this.id.replaceAll("'", "\\\\'");
-		this.display = display;
-		this.sqlDisplay = this.display.replaceAll("'", "\\\\'");
+		this.display = gradient != null ? GradientManager.applyGradient(gradient, display) : display;
 		this.desc = desc;
-		this.sqlDesc = this.desc.replaceAll("'", "\\\\'");
+		this.gradient = gradient;
 	}
 
 	public String getId() {
@@ -62,6 +62,14 @@ public class Tag implements Comparable<Tag>
 	public void setDesc(String desc) {
 		this.desc = desc;
 		this.sqlDesc = this.desc.replaceAll("'", "\\\\'");
+	}
+	
+	public void setGradient(String gradient) {
+		this.gradient = gradient;
+	}
+	
+	public String getGradient() { 
+		return this.gradient;
 	}
 	
 	public boolean isFilled()
