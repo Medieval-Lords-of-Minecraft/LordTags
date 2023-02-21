@@ -3,18 +3,18 @@ package me.ShanaChans.LordTags.Commands;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import me.ShanaChans.LordTags.Inventories.ColorInventory;
+import me.ShanaChans.LordTags.Inventories.ChatColorInventory;
 import me.neoblade298.neocore.bukkit.commands.Subcommand;
 import me.neoblade298.neocore.shared.commands.SubcommandRunner;
 
-public class CmdNamecolor extends Subcommand
+public class CmdChatColor extends Subcommand
 {
-	public CmdNamecolor(String key, String desc, String perm, SubcommandRunner runner) {
+	public CmdChatColor(String key, String desc, String perm, SubcommandRunner runner) {
 		super(key, desc, perm, runner);
 	}
 
 	@Override
 	public void run(CommandSender sender, String[] args) {
-		new ColorInventory((Player) sender);
+		new ChatColorInventory((Player) sender);
 	}
 }

@@ -1,6 +1,9 @@
 package me.ShanaChans.LordTags.Inventories;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -15,20 +18,33 @@ import org.bukkit.inventory.meta.ItemMeta;
 import me.ShanaChans.LordTags.TagAccount;
 import me.ShanaChans.LordTags.TagManager;
 import me.neoblade298.neocore.bukkit.inventories.CoreInventory;
+import me.neoblade298.neocore.bukkit.util.Util;
 import net.md_5.bungee.api.ChatColor;
 
-public class ColorInventory extends CoreInventory
+public class ChatColorInventory extends CoreInventory
 {
+	private static ArrayList<String> colors;
 	private TagAccount acct;
-	public ColorInventory(Player p) 
+	public ChatColorInventory(Player p) 
 	{
-		super(p, Bukkit.createInventory(p, 9, "§4Color Selection"));
+		super(p, Bukkit.createInventory(p, 9, "§4Chat Color Selection"));
 		acct = TagManager.getAccount(p.getUniqueId());
 		invSetup();
 	}
 	
-	private ItemStack setupIcon(ItemStack item, ChatColor c) {
+	public static void initialize(Collection<String> keys) {
+		colors = new ArrayList<String>();
+		for (String key : keys) {
+			colors.add(key);
+		}
+		Collections.sort(colors);
+	}
+	
+	private ItemStack setupIcon(ChatColor c, String id) {
 		ChatColor curr = acct.getNameColor();
+		if (!p.hasPermission("lordtags.chatcolor." + id)) return CoreInventory.createButton(Material.BARRIER, c + id + "&c(No Permission)");
+
+		ItemStack item = CoreInventory.createButton(Material.NAME_TAG, c + id);
 		if (curr != null && curr.equals(c)) {
 			ItemMeta meta = item.getItemMeta();
 			ArrayList<String> lore = new ArrayList<String>();
@@ -44,29 +60,23 @@ public class ColorInventory extends CoreInventory
 	public void invSetup()
 	{
 		ItemStack[] contents = inv.getContents();
-		contents[0] = setupIcon(CoreInventory.createButton(Material.CYAN_WOOL, "&bCyan"), ChatColor.AQUA);
-		contents[2] = setupIcon(CoreInventory.createButton(Material.LIME_WOOL, "&aLime"), ChatColor.GREEN);
-		contents[4] = setupIcon(CoreInventory.createButton(Material.BLUE_WOOL, "&9Blue"), ChatColor.BLUE);
-		contents[6] = setupIcon(CoreInventory.createButton(Material.RED_WOOL, "&cRed"), ChatColor.RED);
-		contents[8] = setupIcon(CoreInventory.createButton(Material.PURPLE_WOOL, ChatColor.LIGHT_PURPLE + "Purple"), ChatColor.LIGHT_PURPLE);
+		int i = 0;
+		for (String id : colors) {
+			ChatColor c = TagManager.getChatColor(id);
+			contents[i++] = setupIcon(c, id);
+		}
 		inv.setContents(contents);
 	}
 
 	@Override
 	public void handleInventoryClick(final InventoryClickEvent e) {
 		e.setCancelled(true);
-		switch (e.getRawSlot()) {
-		case 0: acct.setNameColor(ChatColor.AQUA);
-		break;
-		case 2: acct.setNameColor(ChatColor.GREEN);
-		break;
-		case 4: acct.setNameColor(ChatColor.BLUE);
-		break;
-		case 6: acct.setNameColor(ChatColor.RED);
-		break;
-		case 8: acct.setNameColor(ChatColor.LIGHT_PURPLE);
-		break;
-		}
+		ItemStack item = e.getCurrentItem();
+		if (item == null || item.getType() == Material.BARRIER) return;
+		String id = colors.get(e.getRawSlot());
+		ChatColor c = TagManager.getChatColor(id);
+		acct.setChatColor(id, TagManager.getChatColor(id));
+		Util.msg(p, "&7Successfully set your chat color to " + c + id);
 		invSetup();
 	}
 

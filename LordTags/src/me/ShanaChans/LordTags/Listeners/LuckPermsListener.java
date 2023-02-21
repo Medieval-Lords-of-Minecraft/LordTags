@@ -28,22 +28,22 @@ public class LuckPermsListener implements Listener {
         EventBus eventBus = api.getEventBus();
 
         eventBus.subscribe(pl, NodeAddEvent.class, e -> {
-        	if (!e.getNode().getKey().startsWith("lordtags.tag.")) return;
+        	if (!e.getNode().getKey().startsWith("lordtags.")) return;
         	if (!e.isUser()) return;
         	
     		UUID uuid = UUID.fromString(e.getTarget().getIdentifier().getName());
     		if (recentlyJoined.contains(uuid)) return;
     		
-    		TagManager.removeCache(uuid);
+    		TagManager.clearCaches(uuid);
         });
         eventBus.subscribe(pl, NodeRemoveEvent.class, e -> {
-        	if (!e.getNode().getKey().startsWith("lordtags.tag.")) return;
+        	if (!e.getNode().getKey().startsWith("lordtags.")) return;
         	if (!e.isUser()) return;
         	
     		UUID uuid = UUID.fromString(e.getTarget().getIdentifier().getName());
     		if (recentlyJoined.contains(uuid)) return;
     		
-    		TagManager.removeCache(uuid);
+    		TagManager.clearCaches(uuid);
         });
 	}
 	

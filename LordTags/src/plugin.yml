@@ -15,7 +15,10 @@ commands:
       description: Choose a gradient for your name!
       usage: /gradients
       aliases: [grad]
-   namecolors:
+   namecolor:
       description: Choose a color for your name!
-      usage: /namecolors
+      usage: /namecolor
+   chatcolor:
+      description: Choose a color for your chat!
+      usage: /chatcolor
    

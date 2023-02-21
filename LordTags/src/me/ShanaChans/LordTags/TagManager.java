@@ -1,15 +1,19 @@
 package me.ShanaChans.LordTags;
 
+import java.awt.Color;
+import java.io.File;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -17,6 +21,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import me.ShanaChans.LordTags.Commands.*;
+import me.ShanaChans.LordTags.Inventories.ChatColorInventory;
+import me.ShanaChans.LordTags.Inventories.NameColorInventory;
 import me.ShanaChans.LordTags.Listeners.LuckPermsListener;
 import me.neoblade298.neocore.bukkit.NeoCore;
 import me.neoblade298.neocore.bukkit.bungee.BungeeAPI;
@@ -27,14 +33,21 @@ import me.neoblade298.neocore.bukkit.io.IOType;
 import me.neoblade298.neocore.bukkit.player.PlayerFields;
 import me.neoblade298.neocore.bukkit.util.Util;
 import me.neoblade298.neocore.shared.commands.SubcommandRunner;
+import me.neoblade298.neocore.shared.exceptions.NeoIOException;
+import me.neoblade298.neocore.shared.util.Gradient;
+import me.neoblade298.neocore.shared.util.GradientManager;
 import net.md_5.bungee.api.ChatColor;
 
 public class TagManager extends JavaPlugin implements Listener, IOComponent {
 	private static TagManager inst;
 	private static HashMap<String, Tag> tags = new HashMap<String, Tag>();
 	private static HashMap<UUID, TagAccount> accounts = new HashMap<UUID, TagAccount>();
+	private static HashMap<String, ChatColor> nameColors = new HashMap<String, ChatColor>();
+	private static HashMap<String, ChatColor> chatColors = new HashMap<String, ChatColor>();
 
 	private static ArrayList<String> tagList = new ArrayList<String>();
+	private static ArrayList<String> gradientList = new ArrayList<String>();
+	
 	private static HashMap<String, Tag> tagCreation = new HashMap<String, Tag>();
 
 	private static PlayerFields pfields;
@@ -49,6 +62,8 @@ public class TagManager extends JavaPlugin implements Listener, IOComponent {
 		pfields.initializeField("tag", "");
 		pfields.initializeField("nick", "");
 		pfields.initializeField("namegradient", "");
+		pfields.initializeField("namecolor", "");
+		pfields.initializeField("chatcolor", "");
 
 		Bukkit.getPluginManager().registerEvents(new LuckPermsListener(), this);
 		try (Connection con = NeoCore.getConnection("TagManager");
@@ -62,6 +77,37 @@ public class TagManager extends JavaPlugin implements Listener, IOComponent {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+		
+		for (Gradient g : GradientManager.getGradients()) {
+			gradientList.add(g.getId());
+		}
+		Collections.sort(gradientList);
+		
+		try {
+			NeoCore.loadFiles(new File("/home/MLMC/Resources/shared/LordTags/config.yml"), (yml, file) -> {
+				ConfigurationSection namecolors = yml.getConfigurationSection("namecolors");
+				for (String key : namecolors.getKeys(false)) {
+					nameColors.put(key, ChatColor.of(Color.decode(namecolors.getString(key))));
+				}
+				NameColorInventory.initialize(nameColors.keySet());
+
+				ConfigurationSection chatcolors = yml.getConfigurationSection("chatcolors");
+				for (String key : chatcolors.getKeys(false)) {
+					chatColors.put(key, ChatColor.of(Color.decode(chatcolors.getString(key))));
+				}
+				ChatColorInventory.initialize(chatColors.keySet());
+			});
+		} catch (NeoIOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public static ChatColor getChatColor(String key) {
+		return chatColors.get(key);
+	}
+	
+	public static ChatColor getNameColor(String key) {
+		return nameColors.get(key);
 	}
 
 	public void onDisable() {
@@ -96,12 +142,19 @@ public class TagManager extends JavaPlugin implements Listener, IOComponent {
 				new CmdGradientUnset("unset", "Unsets a player's gradient", "lordtags.admin", SubcommandRunner.BOTH));
 		gradient.registerCommandList("help");
 
-		SubcommandManager namecolors = new SubcommandManager("namecolors", "lordtags.namecolors", null, this);
-		namecolors.register(new CmdNamecolor("", "Opens the color picker", null, SubcommandRunner.PLAYER_ONLY));
-		namecolors
-				.register(new CmdNamecolorSet("set", "Sets a player's color", "lordtags.admin", SubcommandRunner.BOTH));
-		namecolors.register(
-				new CmdNamecolorUnset("unset", "Unsets a player's color", "lordtags.admin", SubcommandRunner.BOTH));
+		SubcommandManager namecolor = new SubcommandManager("namecolor", "lordtags.namecolors", null, this);
+		namecolor.register(new CmdNameColor("", "Opens the color picker", null, SubcommandRunner.PLAYER_ONLY));
+		namecolor
+				.register(new CmdNameColorSet("set", "Sets a player's name color", "lordtags.admin", SubcommandRunner.BOTH));
+		namecolor.register(
+				new CmdNameColorUnset("unset", "Unsets a player's name color", "lordtags.admin", SubcommandRunner.BOTH));
+		
+		SubcommandManager chatcolor = new SubcommandManager("chatcolor", "lordtags.chatcolor", null, this);
+		chatcolor.register(new CmdChatColor("", "Opens the color picker", null, SubcommandRunner.PLAYER_ONLY));
+		chatcolor
+				.register(new CmdChatColorSet("set", "Sets a player's chat color", "lordtags.admin", SubcommandRunner.BOTH));
+		chatcolor.register(
+				new CmdChatColorUnset("unset", "Unsets a player's chat color", "lordtags.admin", SubcommandRunner.BOTH));
 	}
 	
 	public static TagAccount getAccount(UUID uuid) {
@@ -111,9 +164,13 @@ public class TagManager extends JavaPlugin implements Listener, IOComponent {
 	public static ArrayList<String> getTagList() {
 		return tagList;
 	}
+	
+	public static ArrayList<String> getGradientList() {
+		return gradientList;
+	}
 
-	public static void removeCache(UUID uuid) {
-		accounts.get(uuid).removeTagCache();
+	public static void clearCaches(UUID uuid) {
+		accounts.get(uuid).clearCaches();
 	}
 
 	public static TagManager inst() {

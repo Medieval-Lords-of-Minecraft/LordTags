@@ -21,9 +21,12 @@ public class TagAccount {
 	private Gradient nameGradient;
 	private Tag tag;
 	private ArrayList<Tag> tagCache;
+	private ArrayList<String> gradientCache;
 	
 	public TagAccount(Player p) {
+		this.p = p;
 		this.uuid = p.getUniqueId();
+		// Tag
 		if (pfields.exists("tag", uuid)) {
 			Tag tag = TagManager.getTag((String) pfields.getValue(uuid, "tag"));
 			if (tag != null) {
@@ -35,6 +38,7 @@ public class TagAccount {
 			}
 		}
 
+		// Gradient
 		if (pfields.exists("namegradient", uuid)) {
 			Gradient gradient = GradientManager.get((String) (pfields.getValue(uuid, "namegradient")));
 			if (gradient != null) {
@@ -46,7 +50,11 @@ public class TagAccount {
 			}
 		}
 		else if (pfields.exists("namecolor", uuid)) {
-			nameColor = ChatColor.of((String) pfields.getValue(uuid, "namecolor"));
+			nameColor = TagManager.getNameColor((String) pfields.getValue(uuid, "namecolor"));
+		}
+		
+		if (pfields.exists("chatcolor", uuid)) {
+			chatColor = TagManager.getChatColor((String) pfields.getValue(uuid, "chatcolor"));
 		}
 
 		if (pfields.exists("nick", uuid)) {
@@ -75,16 +83,16 @@ public class TagAccount {
 	}
 
 	public ChatColor getChatColor() {
-		return chatColor;
+		return chatColor != null ? chatColor : TagManager.getChatColor("Default");
 	}
 
-	public void setChatColor(ChatColor chatColor) {
+	public void setChatColor(String id, ChatColor chatColor) {
 		this.chatColor = chatColor;
 		if (this.chatColor == null) {
 			pfields.resetField("chatcolor", uuid);
 		}
 		else {
-			pfields.changeField("chatcolor", chatColor.toString(), uuid);
+			pfields.changeField("chatcolor", id, uuid);
 		}
 	}
 
@@ -92,14 +100,14 @@ public class TagAccount {
 		return nameColor;
 	}
 
-	public void setNameColor(ChatColor nameColor) {
+	public void setNameColor(String id, ChatColor nameColor) {
 		this.nameColor = nameColor;
 		this.nameGradient = null;
 		if (this.nameColor == null) {
 			pfields.resetField("namecolor", uuid);
 		}
 		else {
-			pfields.changeField("namecolor", nameColor.toString(), uuid);
+			pfields.changeField("namecolor", id, uuid);
 		}
 		pfields.resetField("namegradient", uuid);
 		calculateDisplay();
@@ -116,7 +124,7 @@ public class TagAccount {
 			pfields.resetField("namegradient", uuid);
 		}
 		else {
-			pfields.changeField("namegradient", nameGradient.toString(), uuid);
+			pfields.changeField("namegradient", nameGradient.getId(), uuid);
 		}
 		pfields.resetField("namecolor", uuid);
 		calculateDisplay();
@@ -148,22 +156,36 @@ public class TagAccount {
 		return tagCache;
 	}
 	
-	public void removeTagCache() {
+	public ArrayList<String> getGradientCache() {
+		if (gradientCache != null) return gradientCache;
+		
+		gradientCache = new ArrayList<String>();
+		for (String gradient : TagManager.getGradientList()) {
+			if (p.hasPermission("lordtags.namegradients." + gradient)) {
+				gradientCache.add(gradient);
+			}
+		}
+		return gradientCache;
+	}
+	
+	public void clearCaches() {
 		tagCache = null;
+		gradientCache = null;
 	}
 
 	private void calculateDisplay() {
 		if (nameColor != null) {
 			display = nameColor + p.getName();
-			nickDisplay = nameColor + (nickname != null ? nickname : p.getName());
+			nickDisplay = nameColor + (nickname != null ? "*" + nickname : p.getName());
 		}
 		else if (nameGradient != null) {
 			display = nameGradient.apply(p.getName());
-			nickDisplay = nameGradient.apply(nickname != null ? nickname : p.getName());
+			nickDisplay = nameGradient.apply(nickname != null ? "*" + nickname : p.getName());
 		}
 		else {
-			display = p.getName();
-			nickDisplay = nickname != null ? nickname : p.getName();
+			ChatColor c = TagManager.getNameColor("Default");
+			display = c + p.getName();
+			nickDisplay = c + (nickname != null ? nickname : p.getName());
 		}
 	}
 }

@@ -12,38 +12,24 @@ import me.neoblade298.neocore.shared.commands.SubcommandRunner;
 import net.md_5.bungee.api.ChatColor;
 import me.neoblade298.neocore.bukkit.util.Util;
 
-public class CmdNamecolorSet extends Subcommand
+public class CmdNameColorUnset extends Subcommand
 {
-	public CmdNamecolorSet(String key, String desc, String perm, SubcommandRunner runner) {
+	public CmdNameColorUnset(String key, String desc, String perm, SubcommandRunner runner) {
 		super(key, desc, perm, runner);
 		color = ChatColor.DARK_RED;
-		args.add(new Arg("player", false), new Arg("color"));
+		args.add(new Arg("player", false));
 	}
 
 	@Override
 	public void run(CommandSender sender, String[] args) 
 	{
-		int offset = 0;
-		Player p = Bukkit.getPlayer(args[0]);
-		if (args.length > 1) {
-			offset = 1;
-			p = Bukkit.getPlayer(args[0]);
-		}
-		else {
-			p = (Player) sender;
-		}
 		
-		ChatColor c = ChatColor.of(args[offset]);
-		if (c == null) {
-			Util.msg(sender, "&cThat color doesn't exist!");
-			return;
-		}
-		
+		Player p = args.length > 0 ? Bukkit.getPlayer(args[0]) : (Player) sender;
 		if (p == null) {
 			Util.msg(sender, "&cThat player isn't online right now!");
 			return;
 		}
-		TagManager.getAccount(p.getUniqueId()).setNameColor(c);
-		Util.msg(sender, "&7Successfully set player's color");
+		TagManager.getAccount(p.getUniqueId()).setNameColor(null, null);
+		Util.msg(sender, "&7Successfully unset player's color");
 	}
 }

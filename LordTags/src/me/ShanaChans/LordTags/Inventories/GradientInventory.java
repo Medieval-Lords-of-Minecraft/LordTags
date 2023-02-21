@@ -2,6 +2,8 @@ package me.ShanaChans.LordTags.Inventories;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -14,6 +16,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import de.tr7zw.nbtapi.NBTItem;
 import me.ShanaChans.LordTags.TagAccount;
+import me.ShanaChans.LordTags.TagManager;
 import me.neoblade298.neocore.bukkit.inventories.CoreInventory;
 import me.neoblade298.neocore.bukkit.util.Util;
 import me.neoblade298.neocore.shared.util.Gradient;
@@ -21,6 +24,7 @@ import me.neoblade298.neocore.shared.util.GradientManager;
 
 public class GradientInventory extends CoreInventory
 {
+	private static HashMap<String, ItemStack> icons = new HashMap<String, ItemStack>();
 	private final int MENU_MODEL = 5000;
 	private final static int GRADIENT = 5001;
 	private final int NEXT = 5002;
@@ -28,13 +32,11 @@ public class GradientInventory extends CoreInventory
 	private final int CURRENT_ICON = 5004;
 	private int page;
 	private TagAccount acct;
-	private static ItemStack[] icons;
+	private ArrayList<String> gradients;
 	
 	static {
-		icons = new ItemStack[GradientManager.getGradients().size()];
-		int i = 0;
 		for (Gradient gradient : GradientManager.getGradients()) {
-			icons[i++] = setupIcon(gradient);
+			icons.put(gradient.getId(), setupIcon(gradient));
 		}
 	}
 	
@@ -42,7 +44,9 @@ public class GradientInventory extends CoreInventory
 	{
 		super(p, Bukkit.createInventory(p, 54, "§4Gradient Selection"));
 		page = 1;
-		
+
+		acct = TagManager.getAccount(p.getUniqueId());
+		gradients = acct.getGradientCache();
 		invSetup();
 	}
 	
@@ -127,7 +131,7 @@ public class GradientInventory extends CoreInventory
 		contents[52] = border;
 		
 		
-		if(icons.length > 28 * page)
+		if(gradients.size() > 28 * page)
 		{
 			contents[53] = next;
 		}
@@ -136,11 +140,11 @@ public class GradientInventory extends CoreInventory
 			contents[53] = border;
 		}
 		
-		if(icons.length != 0)
+		if(gradients.size() != 0)
 		{
 			int i = 0;
 			int j = 0;
-			for(int k = 0 + 28 * (page - 1); k < icons.length; k++)
+			for(int k = 0 + 28 * (page - 1); k < gradients.size(); k++)
 			{
 				
 				if(i >= 4)
@@ -148,13 +152,14 @@ public class GradientInventory extends CoreInventory
 					continue;
 				}
 				
-				ItemStack item = icons[k];
+				String g = gradients.get(k);
+				ItemStack item = icons.get(g);
 				NBTItem nbti = new NBTItem(item);
 				if (curr != null && nbti.getString("gradient").equals(curr.getId())) {
 					contents[(10 + 9*i) + j] = setupCurrentIcon(curr);
 				}
 				else {
-					contents[(10 + 9*i) + j] = icons[k];
+					contents[(10 + 9*i) + j] = item;
 				}
 				
 				if(j >= 6)

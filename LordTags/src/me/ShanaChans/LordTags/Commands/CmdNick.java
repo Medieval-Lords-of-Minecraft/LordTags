@@ -39,9 +39,11 @@ public class CmdNick extends Subcommand
 		
 		if (args[0].equalsIgnoreCase("clear")) {
 			TagManager.getAccount(p.getUniqueId()).setNickname(null);
+			Util.msg(s, "&7Successfully cleared nickname!");
 		}
 		else {
 			TagManager.getAccount(p.getUniqueId()).setNickname(args[0]);
+			Util.msg(s, "&7Successfully set nickname!");
 		}
 	}
 }
