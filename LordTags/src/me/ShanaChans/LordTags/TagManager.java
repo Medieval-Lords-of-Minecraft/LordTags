@@ -82,7 +82,9 @@ public class TagManager extends JavaPlugin implements Listener, IOComponent {
 			gradientList.add(g.getId());
 		}
 		Collections.sort(gradientList);
-		
+	}
+	
+	public static void load() {
 		try {
 			NeoCore.loadFiles(new File("/home/MLMC/Resources/shared/LordTags/config.yml"), (yml, file) -> {
 				ConfigurationSection namecolors = yml.getConfigurationSection("namecolors");
@@ -142,7 +144,7 @@ public class TagManager extends JavaPlugin implements Listener, IOComponent {
 				new CmdGradientUnset("unset", "Unsets a player's gradient", "lordtags.admin", SubcommandRunner.BOTH));
 		gradient.registerCommandList("help");
 
-		SubcommandManager namecolor = new SubcommandManager("namecolor", "lordtags.namecolors", null, this);
+		SubcommandManager namecolor = new SubcommandManager("namecolor", "lordtags.namecolor", null, this);
 		namecolor.register(new CmdNameColor("", "Opens the color picker", null, SubcommandRunner.PLAYER_ONLY));
 		namecolor
 				.register(new CmdNameColorSet("set", "Sets a player's name color", "lordtags.admin", SubcommandRunner.BOTH));
@@ -155,6 +157,9 @@ public class TagManager extends JavaPlugin implements Listener, IOComponent {
 				.register(new CmdChatColorSet("set", "Sets a player's chat color", "lordtags.admin", SubcommandRunner.BOTH));
 		chatcolor.register(
 				new CmdChatColorUnset("unset", "Unsets a player's chat color", "lordtags.admin", SubcommandRunner.BOTH));
+		
+		SubcommandManager lordtags = new SubcommandManager("lordtags", "lordtags.admin", null, this);
+		lordtags.register(new CmdLordTagsReload("reload", "Reloads chat and name colors only", null, SubcommandRunner.BOTH));
 	}
 	
 	public static TagAccount getAccount(UUID uuid) {

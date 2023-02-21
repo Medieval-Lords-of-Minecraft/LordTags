@@ -21,4 +21,7 @@ commands:
    chatcolor:
       description: Choose a color for your chat!
       usage: /chatcolor
+   lordtags:
+      description: Base command
+      usage: /lordtags
    

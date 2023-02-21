@@ -30,6 +30,11 @@ public class TagAccount {
 		if (pfields.exists("tag", uuid)) {
 			Tag tag = TagManager.getTag((String) pfields.getValue(uuid, "tag"));
 			if (tag != null) {
+				if (!p.hasPermission("lordtags.tag." + tag.getId())) {
+					Bukkit.getLogger().info("[LordTags] Player " + p.getName() + " doesn't have permission for tag " + tag.getId());
+					setTag(null);
+					return;
+				}
 				this.tag = tag;
 			}
 			else {
@@ -42,6 +47,11 @@ public class TagAccount {
 		if (pfields.exists("namegradient", uuid)) {
 			Gradient gradient = GradientManager.get((String) (pfields.getValue(uuid, "namegradient")));
 			if (gradient != null) {
+				if (!p.hasPermission("lordtags.namegradient." + gradient.getId())) {
+					Bukkit.getLogger().info("[LordTags] Player " + p.getName() + " doesn't have permission for gradient " + gradient.getId());
+					setNameGradient(null);
+					return;
+				}
 				this.nameGradient = gradient;
 			}
 			else {
@@ -50,14 +60,31 @@ public class TagAccount {
 			}
 		}
 		else if (pfields.exists("namecolor", uuid)) {
-			nameColor = TagManager.getNameColor((String) pfields.getValue(uuid, "namecolor"));
+			String id = (String) pfields.getValue(uuid, "namecolor");
+			if (!p.hasPermission("lordtags.namecolor." + id)) {
+				Bukkit.getLogger().info("[LordTags] Player " + p.getName() + " doesn't have permission for name color " + id);
+				setNameColor(null, null);
+				return;
+			}
+			nameColor = TagManager.getNameColor(id);
 		}
 		
 		if (pfields.exists("chatcolor", uuid)) {
+			String id = (String) pfields.getValue(uuid, "chatcolor");
+			if (!p.hasPermission("lordtags.chatcolor." + id)) {
+				Bukkit.getLogger().info("[LordTags] Player " + p.getName() + " doesn't have permission for chat color " + id);
+				setChatColor(null, null);
+				return;
+			}
 			chatColor = TagManager.getChatColor((String) pfields.getValue(uuid, "chatcolor"));
 		}
 
 		if (pfields.exists("nick", uuid)) {
+			if (!p.hasPermission("lordtags.nick")) {
+				Bukkit.getLogger().info("[LordTags] Player " + p.getName() + " doesn't have permission to use a nickname!");
+				setNickname(null);
+				return;
+			}
 			this.nickname = (String) pfields.getValue(uuid, "nick");
 		}
 		calculateDisplay();
