@@ -29,7 +29,7 @@ public class CmdNamecolorUnset extends Subcommand
 			Util.msg(sender, "&cThat player isn't online right now!");
 			return;
 		}
-		TagManager.removeNameColor(p);
+		TagManager.getAccount(p.getUniqueId()).setNameColor(null);
 		Util.msg(sender, "&7Successfully unset player's color");
 	}
 }

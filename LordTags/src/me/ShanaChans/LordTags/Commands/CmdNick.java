@@ -14,7 +14,7 @@ import me.neoblade298.neocore.shared.commands.SubcommandRunner;
 
 public class CmdNick extends Subcommand
 {
-	private static final Pattern NICK_REGEX = Pattern.compile("[\\w]{1,15}");
+	private static final Pattern NICK_REGEX = Pattern.compile("[\\w]{3,16}");
 	public CmdNick(String key, String desc, String perm, SubcommandRunner runner) {
 		super(key, desc, perm, runner);
 		args.add(new Arg("nickname/clear"), new Arg("player", false));
@@ -23,12 +23,12 @@ public class CmdNick extends Subcommand
 	@Override
 	public void run(CommandSender s, String[] args) 
 	{
-		Player target = args.length > 1 ? Bukkit.getPlayer(args[0]) : (Player) s;
+		Player p = args.length > 1 ? Bukkit.getPlayer(args[0]) : (Player) s;
 		if (args.length > 0 && !s.hasPermission("mycommand.staff")) {
 			Util.msg(s, "&cYou don't have the permission to change other users' nicknames!");
 			return;
 		}
-		if (target == null) {
+		if (p == null) {
 			Util.msg(s, "&cThat player isn't online!");
 			return;
 		}
@@ -38,10 +38,10 @@ public class CmdNick extends Subcommand
 		}
 		
 		if (args[0].equalsIgnoreCase("clear")) {
-			TagManager.removePlayerNick(target);
+			TagManager.getAccount(p.getUniqueId()).setNickname(null);
 		}
 		else {
-			TagManager.setPlayerNick(target, args[0]);
+			TagManager.getAccount(p.getUniqueId()).setNickname(args[0]);
 		}
 	}
 }

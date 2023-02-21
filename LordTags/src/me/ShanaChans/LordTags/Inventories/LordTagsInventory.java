@@ -17,8 +17,10 @@ import org.bukkit.inventory.meta.SkullMeta;
 
 import de.tr7zw.nbtapi.NBTItem;
 import me.ShanaChans.LordTags.Tag;
+import me.ShanaChans.LordTags.TagAccount;
 import me.ShanaChans.LordTags.TagManager;
 import me.neoblade298.neocore.bukkit.inventories.CoreInventory;
+import me.neoblade298.neocore.bukkit.util.Util;
 import me.neoblade298.neocore.shared.util.SharedUtil;
 
 public class LordTagsInventory extends CoreInventory
@@ -30,11 +32,13 @@ public class LordTagsInventory extends CoreInventory
 	private final int HEAD = 5004;
 	private int page;
 	private ArrayList<Tag> tags;
+	private TagAccount acct;
 	
-	public LordTagsInventory(Player p, ArrayList<Tag> tags) 
+	public LordTagsInventory(Player p) 
 	{
-		super(p, Bukkit.createInventory(p, 54, "§4Total Tags: " + tags.size()));
-		this.tags = tags;
+		super(p, Bukkit.createInventory(p, 54, "§4Total Tags: " + TagManager.getAccount(p.getUniqueId()).getTagCache().size()));
+		acct = TagManager.getAccount(p.getUniqueId());
+		this.tags = acct.getTagCache();
 		page = 1;
 		
 		invSetup();
@@ -43,7 +47,7 @@ public class LordTagsInventory extends CoreInventory
 	public void invSetup()
 	{
 		inv.clear();
-		Tag curr = TagManager.getPlayerTag(p);
+		Tag curr = acct.getTag();
 		String currDisplay = curr == null ? "§7None" : curr.getDisplay();
 		
 		ItemStack[] contents = inv.getContents();
@@ -165,6 +169,7 @@ public class LordTagsInventory extends CoreInventory
 	
 	public void handleInventoryClick(final InventoryClickEvent e) {
 		e.setCancelled(true);
+		if (e.getCurrentItem() == null) return;
 		if(isNext(e.getCurrentItem()))
 		{
 			page++;
@@ -180,16 +185,20 @@ public class LordTagsInventory extends CoreInventory
 			NBTItem nbti = new NBTItem(e.getCurrentItem());
 			String id = nbti.getString("id");
 			if (e.getCurrentItem().containsEnchantment(Enchantment.LUCK)) {
-				TagManager.removePlayerTag(p);
+				acct.setTag(null);
+				Util.msg(p, "&7Successfully removed tag.");
 			}
 			else if (TagManager.tagExists(id)) {
-				TagManager.setPlayerTag((Player) e.getWhoClicked(), id);
+				Tag tag = TagManager.getTag(id);
+				acct.setTag(tag);
+				Util.msg(p, "&7Successfully set tag to " + tag.getDisplay() + "&7.");
 			}
 			invSetup();
 		}
 		if(isHead(e.getCurrentItem()))
 		{
-			TagManager.removePlayerTag(p);
+			acct.setTag(null);
+			Util.msg(p, "&7Successfully removed tag.");
 			invSetup();
 		}
 	}

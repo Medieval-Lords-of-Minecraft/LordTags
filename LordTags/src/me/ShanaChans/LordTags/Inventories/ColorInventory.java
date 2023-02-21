@@ -11,21 +11,24 @@ import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+
+import me.ShanaChans.LordTags.TagAccount;
 import me.ShanaChans.LordTags.TagManager;
 import me.neoblade298.neocore.bukkit.inventories.CoreInventory;
 import net.md_5.bungee.api.ChatColor;
 
 public class ColorInventory extends CoreInventory
 {
-	
+	private TagAccount acct;
 	public ColorInventory(Player p) 
 	{
 		super(p, Bukkit.createInventory(p, 9, "§4Color Selection"));
+		acct = TagManager.getAccount(p.getUniqueId());
 		invSetup();
 	}
 	
 	private ItemStack setupIcon(ItemStack item, ChatColor c) {
-		ChatColor curr = TagManager.getNameColor(p);
+		ChatColor curr = acct.getNameColor();
 		if (curr != null && curr.equals(c)) {
 			ItemMeta meta = item.getItemMeta();
 			ArrayList<String> lore = new ArrayList<String>();
@@ -53,15 +56,15 @@ public class ColorInventory extends CoreInventory
 	public void handleInventoryClick(final InventoryClickEvent e) {
 		e.setCancelled(true);
 		switch (e.getRawSlot()) {
-		case 0: TagManager.setNameColor(p, ChatColor.AQUA);
+		case 0: acct.setNameColor(ChatColor.AQUA);
 		break;
-		case 2: TagManager.setNameColor(p, ChatColor.GREEN);
+		case 2: acct.setNameColor(ChatColor.GREEN);
 		break;
-		case 4: TagManager.setNameColor(p, ChatColor.BLUE);
+		case 4: acct.setNameColor(ChatColor.BLUE);
 		break;
-		case 6: TagManager.setNameColor(p, ChatColor.RED);
+		case 6: acct.setNameColor(ChatColor.RED);
 		break;
-		case 8: TagManager.setNameColor(p, ChatColor.LIGHT_PURPLE);
+		case 8: acct.setNameColor(ChatColor.LIGHT_PURPLE);
 		break;
 		}
 		invSetup();

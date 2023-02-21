@@ -29,7 +29,7 @@ public class CmdGradientUnset extends Subcommand
 			Util.msg(sender, "&cThat player isn't online right now!");
 			return;
 		}
-		TagManager.removeNameGradient(p);
+		TagManager.getAccount(p.getUniqueId()).setNameGradient(null);
 		Util.msg(sender, "&7Successfully unset player's gradient");
 	}
 }

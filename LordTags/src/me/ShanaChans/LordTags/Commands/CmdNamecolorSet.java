@@ -43,7 +43,7 @@ public class CmdNamecolorSet extends Subcommand
 			Util.msg(sender, "&cThat player isn't online right now!");
 			return;
 		}
-		TagManager.setNameColor(p, c);
+		TagManager.getAccount(p.getUniqueId()).setNameColor(c);
 		Util.msg(sender, "&7Successfully set player's color");
 	}
 }

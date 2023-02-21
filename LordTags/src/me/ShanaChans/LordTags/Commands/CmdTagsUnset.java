@@ -27,7 +27,7 @@ public class CmdTagsUnset extends Subcommand
 			Util.msg(sender, "&cThat player isn't online right now!");
 			return;
 		}
-		TagManager.removePlayerTag(p);
+		TagManager.getAccount(p.getUniqueId()).setTag(null);
 		Util.msg(sender, "&7Successfully unset player's tag");
 	}
 }

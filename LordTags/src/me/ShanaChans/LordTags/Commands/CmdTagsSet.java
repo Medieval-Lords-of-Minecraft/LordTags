@@ -47,7 +47,7 @@ public class CmdTagsSet extends Subcommand
 			Util.msg(sender, "&cThat player doesn't have the permission to use that tag!");
 			return;
 		}
-		TagManager.setPlayerTag(p, tag);
+		TagManager.getAccount(p.getUniqueId()).setTag(tag);
 		Util.msg(sender, "&7Successfully set player's tag");
 	}
 }

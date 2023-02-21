@@ -45,7 +45,7 @@ public class CmdGradientSet extends Subcommand
 			Util.msg(sender, "&cThat player isn't online right now!");
 			return;
 		}
-		TagManager.setNameGradient(p, g);
+		TagManager.getAccount(p.getUniqueId()).setNameGradient(g);
 		Util.msg(sender, "&7Successfully set player's gradient");
 	}
 }

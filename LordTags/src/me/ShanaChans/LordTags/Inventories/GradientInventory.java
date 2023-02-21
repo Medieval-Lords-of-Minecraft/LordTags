@@ -13,8 +13,9 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import de.tr7zw.nbtapi.NBTItem;
-import me.ShanaChans.LordTags.TagManager;
+import me.ShanaChans.LordTags.TagAccount;
 import me.neoblade298.neocore.bukkit.inventories.CoreInventory;
+import me.neoblade298.neocore.bukkit.util.Util;
 import me.neoblade298.neocore.shared.util.Gradient;
 import me.neoblade298.neocore.shared.util.GradientManager;
 
@@ -26,6 +27,7 @@ public class GradientInventory extends CoreInventory
 	private final int PREV = 5003;
 	private final int CURRENT_ICON = 5004;
 	private int page;
+	private TagAccount acct;
 	private static ItemStack[] icons;
 	
 	static {
@@ -51,8 +53,8 @@ public class GradientInventory extends CoreInventory
 		ArrayList<String> lore = new ArrayList<String>();
 		lore.add(g.apply("Click to apply this gradient to your name!"));
 		meta.setLore(lore);
-		item.setItemMeta(meta);
 		meta.setCustomModelData(GRADIENT);
+		item.setItemMeta(meta);
 		NBTItem nbti = new NBTItem(item);
 		nbti.setString("gradient", g.getId());
 		return nbti.getItem();
@@ -77,7 +79,7 @@ public class GradientInventory extends CoreInventory
 	public void invSetup()
 	{
 		inv.clear();
-		Gradient curr = TagManager.getNameGradient(p);
+		Gradient curr = acct.getNameGradient();
 		String currDisplay = curr != null ? curr.apply(curr.getId()) : "§7None";
 		
 		ItemStack[] contents = inv.getContents();
@@ -183,6 +185,7 @@ public class GradientInventory extends CoreInventory
 	
 	public void handleInventoryClick(final InventoryClickEvent e) {
 		e.setCancelled(true);
+		if (e.getCurrentItem() == null) return;
 		if(isNext(e.getCurrentItem()))
 		{
 			page++;
@@ -198,16 +201,20 @@ public class GradientInventory extends CoreInventory
 			NBTItem nbti = new NBTItem(e.getCurrentItem());
 			String id = nbti.getString("gradient");
 			if (e.getCurrentItem().containsEnchantment(Enchantment.LUCK)) {
-				TagManager.removeNameGradient((Player) e.getWhoClicked());
+				acct.setNameGradient(null);
+				Util.msg(p, "Successfully unset your name gradient");
 			}
-			else if (TagManager.tagExists(id)) {
-				TagManager.setNameGradient((Player) e.getWhoClicked(), GradientManager.get(id));
+			else if (GradientManager.get(id) != null) {
+				Gradient g = GradientManager.get(id);
+				acct.setNameGradient(g);
+				Util.msg(p, g.apply("Successfully set your name gradient to " + id + "!"));
 			}
 			invSetup();
 		}
 		else if(isCurrentIcon(e.getCurrentItem()))
 		{
-			TagManager.removeNameGradient((Player) e.getWhoClicked());
+			acct.setNameGradient(null);
+			Util.msg(p, "Successfully unset your name gradient");
 			invSetup();
 		}
 	}
@@ -218,11 +225,6 @@ public class GradientInventory extends CoreInventory
 	
 	public void handleInventoryClose(final InventoryCloseEvent e) {
 		
-	}
-	
-	public boolean isUntouchable(ItemStack item) {
-		return item != null && item.hasItemMeta() && item.getItemMeta().hasCustomModelData() &&
-				(item.getItemMeta().getCustomModelData() == MENU_MODEL || item.getItemMeta().getCustomModelData() == GRADIENT);
 	}
 	
 	public boolean isNext(ItemStack item) {
