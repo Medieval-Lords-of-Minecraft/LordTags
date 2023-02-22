@@ -84,6 +84,11 @@ public class TagManager extends JavaPlugin implements Listener {
 		Collections.sort(gradientList);
 		
 		load();
+		
+		// Make this plugin safe to reload (must reload neoplaceholders too)
+		for (Player p : Bukkit.getOnlinePlayers()) {
+			accounts.put(p.getUniqueId(), new TagAccount(p));
+		}
 	}
 	
 	public static void load() {

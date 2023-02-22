@@ -235,7 +235,7 @@ public class TagAccount {
 		}
 		for (StringPair pair : chatColorDefaults) {
 			if (p.hasPermission(pair.getKey())) {
-				ChatColor newChatColor = TagManager.getNameColor(pair.getValue());
+				ChatColor newChatColor = TagManager.getChatColor(pair.getValue());
 				if (!defChatColor.equals(newChatColor)) {
 					changed = true;
 					defChatColor = newChatColor;
