@@ -17,6 +17,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -38,7 +39,7 @@ import me.neoblade298.neocore.shared.util.Gradient;
 import me.neoblade298.neocore.shared.util.GradientManager;
 import net.md_5.bungee.api.ChatColor;
 
-public class TagManager extends JavaPlugin implements Listener, IOComponent {
+public class TagManager extends JavaPlugin implements Listener {
 	private static TagManager inst;
 	private static HashMap<String, Tag> tags = new HashMap<String, Tag>();
 	private static HashMap<UUID, TagAccount> accounts = new HashMap<UUID, TagAccount>();
@@ -57,7 +58,6 @@ public class TagManager extends JavaPlugin implements Listener, IOComponent {
 		Bukkit.getServer().getLogger().info("LordTags Enabled");
 		Bukkit.getPluginManager().registerEvents(this, this);
 		initCommands();
-		NeoCore.registerIOComponent(this, this, "TagManager");
 		pfields = NeoCore.createPlayerFields("lordtags", this, true);
 		pfields.initializeField("tag", "");
 		pfields.initializeField("nick", "");
@@ -249,12 +249,9 @@ public class TagManager extends JavaPlugin implements Listener, IOComponent {
 		}
 	}
 
-	@Override
-	public void cleanup(Statement insert, Statement delete) {
-	}
-
-	@Override
-	public void loadPlayer(Player p, Statement stmt) {
+	@EventHandler
+	public void onJoin(PlayerJoinEvent e) {
+		Player p = e.getPlayer();
 		BukkitRunnable runnable = new BukkitRunnable() {
 			public void run() {
 				accounts.put(p.getUniqueId(), new TagAccount(p));
@@ -262,14 +259,6 @@ public class TagManager extends JavaPlugin implements Listener, IOComponent {
 		};
 		NeoCore.addPostIORunnable(runnable, IOType.LOAD, p.getUniqueId(), false);
 	}
-
-	@Override
-	public void preloadPlayer(OfflinePlayer p, Statement stmt) {
-	}
-
-	@Override
-	public void savePlayer(Player p, Statement insert, Statement delete) {
-	} // All saving handled by NeoCore
 
 	public static PlayerFields getPlayerFields() {
 		return pfields;

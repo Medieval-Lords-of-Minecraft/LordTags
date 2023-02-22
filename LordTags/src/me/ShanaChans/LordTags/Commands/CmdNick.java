@@ -24,7 +24,7 @@ public class CmdNick extends Subcommand
 	public void run(CommandSender s, String[] args) 
 	{
 		Player p = args.length > 1 ? Bukkit.getPlayer(args[0]) : (Player) s;
-		if (args.length > 0 && !s.hasPermission("mycommand.staff")) {
+		if (args.length > 1 && !s.hasPermission("mycommand.staff")) {
 			Util.msg(s, "&cYou don't have the permission to change other users' nicknames!");
 			return;
 		}

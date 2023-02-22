@@ -28,6 +28,8 @@ public class LuckPermsListener implements Listener {
         EventBus eventBus = api.getEventBus();
 
         eventBus.subscribe(pl, NodeAddEvent.class, e -> {
+        	System.out.println("Key: " + e.getNode().getKey())
+        	System.out.println("Type: " + e.getNode().getType());
         	if (!e.getNode().getKey().startsWith("lordtags.")) return;
         	if (!e.isUser()) return;
         	
