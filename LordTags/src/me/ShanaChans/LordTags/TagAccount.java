@@ -199,9 +199,9 @@ public class TagAccount {
 		if (tagCache != null) return tagCache;
 
 		tagCache = new ArrayList<Tag>();
-		for (String tag : TagManager.getTagList()) {
-			if (p.hasPermission("lordtags.tag." + tag)) {
-				tagCache.add(TagManager.getTag(tag));
+		for (Tag tag : TagManager.getTagList()) {
+			if (p.hasPermission("lordtags.tag." + tag.getId())) {
+				tagCache.add(tag);
 			}
 		}
 		return tagCache;

@@ -33,7 +33,7 @@ public class CmdNick extends Subcommand
 			return;
 		}
 		if (!NICK_REGEX.matcher(args[0]).matches()) {
-			Util.msg(s, "&cYour nickname must only include characters allowed in minecraft usernames and be at most 15 characters!");
+			Util.msg(s, "&cYour nickname must be a valid minecraft username and 3-16 characters!");
 			return;
 		}
 		

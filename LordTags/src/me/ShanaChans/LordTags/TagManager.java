@@ -1,6 +1,7 @@
 package me.ShanaChans.LordTags;
 
 import java.awt.Color;
+import java.util.Comparator;
 import java.io.File;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -9,6 +10,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.TreeSet;
 import java.util.UUID;
 import org.bukkit.Bukkit;
@@ -39,19 +41,29 @@ import me.neoblade298.neocore.shared.util.GradientManager;
 import net.md_5.bungee.api.ChatColor;
 
 public class TagManager extends JavaPlugin implements Listener {
+	private static Comparator<Tag> comp = new Comparator<Tag>() {
+		@Override
+		public int compare(Tag t1, Tag t2) {
+			String d1 = ChatColor.stripColor(t1.getDisplay());
+			String d2 = ChatColor.stripColor(t2.getDisplay());
+			return d1.compareTo(d2);
+		}
+	};
+	
 	private static TagManager inst;
 	private static HashMap<String, Tag> tags = new HashMap<String, Tag>();
 	private static HashMap<UUID, TagAccount> accounts = new HashMap<UUID, TagAccount>();
 	private static HashMap<String, ChatColor> nameColors = new HashMap<String, ChatColor>();
 	private static HashMap<String, ChatColor> chatColors = new HashMap<String, ChatColor>();
 
-	private static TreeSet<String> tagList = new TreeSet<String>();
+	private static TreeSet<Tag> tagList = new TreeSet<Tag>(comp);
 	private static ArrayList<String> gradientList = new ArrayList<String>();
 	
 	
 	private static HashMap<String, Tag> tagCreation = new HashMap<String, Tag>();
 
 	private static PlayerFields pfields;
+	
 
 	public void onEnable() {
 		inst = this;
@@ -72,7 +84,7 @@ public class TagManager extends JavaPlugin implements Listener {
 			while (rs.next()) {
 				Tag tag = new Tag(rs.getString("id"), rs.getString("display"), rs.getString("desc"), rs.getString("gradient"));
 				tags.put(tag.getId(), tag);
-				tagList.add(tag.getId());
+				tagList.add(tag);
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -176,12 +188,18 @@ public class TagManager extends JavaPlugin implements Listener {
 		return accounts.get(uuid);
 	}
 
-	public static TreeSet<String> getTagList() {
+	public static TreeSet<Tag> getTagList() {
 		return tagList;
 	}
 	
 	public static ArrayList<String> getGradientList() {
 		return gradientList;
+	}
+	
+	public static void clearAllCaches() {
+		for (TagAccount acct : accounts.values()) {
+			acct.clearCaches();
+		}
 	}
 
 	public static void clearCaches(UUID uuid) {
@@ -207,7 +225,7 @@ public class TagManager extends JavaPlugin implements Listener {
 	// Only called by command to avoid endless pluginmsg loop
 	public static void createTag(CommandSender s, Tag tag) {
 		tags.put(tag.getId(), tag);
-		tagList.add(tag.getId());
+		tagList.add(tag);
 		String gradientSql = tag.getGradient() != null ? "'" + tag.getGradient() + "'" : "null";
 		BungeeAPI.sendPluginMessage("lordtags_newtag", new String[] { tag.getId(), tag.getDisplay(), tag.getDesc(), tag.getGradient() != null ? tag.getGradient() : "" });
 		try (Connection con = NeoCore.getConnection("TagManager"); Statement stmt = con.createStatement();) {
@@ -217,12 +235,20 @@ public class TagManager extends JavaPlugin implements Listener {
 			e.printStackTrace();
 		}
 		Util.msg(s, "&7Successfully created tag " + tag.getId());
+		clearAllCaches(); // To reset everyone's tag inventory
 	}
 
 	// Only called by command to avoid endless pluginmsg loop
 	public static void removeTag(CommandSender s, String id) {
 		tags.remove(id);
-		tagList.remove(id);
+		Iterator<Tag> iter = tagList.iterator();
+		while (iter.hasNext()) {
+			Tag tag = iter.next();
+			if (tag.getId().equals(id)) {
+				iter.remove();
+				break;
+			}
+		}
 
 		BungeeAPI.sendPluginMessage("lordtags_removetag", new String[] { id });
 		Util.msg(s, "&7Successfully removed tag " + id);
@@ -231,6 +257,7 @@ public class TagManager extends JavaPlugin implements Listener {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+		clearAllCaches(); // To reset everyone's tag inventory
 	}
 
 	public static HashMap<String, Tag> getTagCreation() {
@@ -251,15 +278,23 @@ public class TagManager extends JavaPlugin implements Listener {
 			ArrayList<String> msgs = e.getMessages();
 			Tag tag = new Tag(msgs.get(0), msgs.get(1), msgs.get(2), msgs.get(3));
 			tags.put(tag.getId(), tag);
-			tagList.add(tag.getId());
+			tagList.add(tag);
 			Bukkit.getLogger().info("[LordTags] Received plugin message to add tag " + tag.getId());
 		}
 		else if (e.getChannel().equals("lordtags_removetag")) {
 			tags.remove(e.getMessages().get(0));
-			tagList.remove(e.getMessages().get(0));
+			Iterator<Tag> iter = tagList.iterator();
+			while (iter.hasNext()) {
+				Tag tag = iter.next();
+				if (tag.getId().equals(e.getMessages().get(0))) {
+					iter.remove();
+					break;
+				}
+			}
 			removePlayersWithTag(e.getMessages().get(0));
 			Bukkit.getLogger().info("[LordTags] Received plugin message to remove tag " + e.getMessages().get(0));
 		}
+		clearAllCaches(); // To reset everyone's tag inventory
 	}
 
 	@EventHandler
