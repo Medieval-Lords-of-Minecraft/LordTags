@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import me.neoblade298.neocore.bukkit.player.PlayerFields;
 import me.neoblade298.neocore.shared.util.Gradient;
@@ -225,27 +226,33 @@ public class TagAccount {
 		for (StringPair pair : nameColorDefaults) {
 			if (p.hasPermission(pair.getKey())) {
 				ChatColor newNameColor = TagManager.getNameColor(pair.getValue());
-				if (defNameColor.equals(newNameColor)) {
+				if (!defNameColor.equals(newNameColor)) {
 					changed = true;
 					defNameColor = newNameColor;
 				}
+				break;
 			}
 		}
 		for (StringPair pair : chatColorDefaults) {
 			if (p.hasPermission(pair.getKey())) {
 				ChatColor newChatColor = TagManager.getNameColor(pair.getValue());
-				if (defChatColor.equals(newChatColor)) {
+				if (!defChatColor.equals(newChatColor)) {
 					changed = true;
 					defChatColor = newChatColor;
 				}
+				break;
 			}
 		}
-		
+
 		// Reset everything if a new default was made available
 		if (changed && !initial) {
-			setNameGradient(null);
-			setNameColor(null, null);
-			setChatColor(null, null);
+			new BukkitRunnable() {
+				public void run() {
+					setNameGradient(null);
+					setNameColor(null, null);
+					setChatColor(null, null);
+				}
+			}.runTask(TagManager.inst());
 		}
 	}
 
