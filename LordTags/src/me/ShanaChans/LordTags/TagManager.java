@@ -60,7 +60,7 @@ public class TagManager extends JavaPlugin implements Listener {
 		initCommands();
 		pfields = NeoCore.createPlayerFields("lordtags", this, true);
 		pfields.initializeField("tag", "");
-		pfields.initializeField("nick", "");
+		pfields.initializeField("nickname", "");
 		pfields.initializeField("namegradient", "");
 		pfields.initializeField("namecolor", "");
 		pfields.initializeField("chatcolor", "");

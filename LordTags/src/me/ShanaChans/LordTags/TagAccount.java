@@ -79,6 +79,8 @@ public class TagAccount {
 						+ pfields.getValue(uuid, "gradient") + " for player " + p.getName());
 			}
 		}
+		
+		// Name color
 		else if (pfields.exists("namecolor", uuid)) {
 			String id = (String) pfields.getValue(uuid, "namecolor");
 			if (!p.hasPermission("lordtags.namecolor." + id)) {
@@ -89,6 +91,7 @@ public class TagAccount {
 			nameColor = TagManager.getNameColor(id);
 		}
 		
+		// Chat color
 		if (pfields.exists("chatcolor", uuid)) {
 			String id = (String) pfields.getValue(uuid, "chatcolor");
 			if (!p.hasPermission("lordtags.chatcolor." + id)) {
@@ -99,13 +102,13 @@ public class TagAccount {
 			chatColor = TagManager.getChatColor((String) pfields.getValue(uuid, "chatcolor"));
 		}
 
-		if (pfields.exists("nick", uuid)) {
+		if (pfields.exists("nickname", uuid)) {
 			if (!p.hasPermission("lordtags.nick")) {
 				Bukkit.getLogger().info("[LordTags] Player " + p.getName() + " doesn't have permission to use a nickname!");
 				setNickname(null);
 				return;
 			}
-			this.nickname = (String) pfields.getValue(uuid, "nick");
+			this.nickname = (String) pfields.getValue(uuid, "nickname");
 		}
 		calculateDefaults(true);
 		calculateDisplay();
