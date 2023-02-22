@@ -1,6 +1,7 @@
 package me.ShanaChans.LordTags;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -14,14 +15,32 @@ import net.md_5.bungee.api.ChatColor;
 public class TagAccount {
 	private static PlayerFields pfields = TagManager.getPlayerFields();
 
+	private static ArrayList<StringPair> nameColorDefaults = new ArrayList<StringPair>();
+	private static ArrayList<StringPair> chatColorDefaults = new ArrayList<StringPair>();
+
 	private Player p;
 	private UUID uuid;
 	private String display, nickDisplay, nickname;
 	private ChatColor chatColor, nameColor;
+	private ChatColor defChatColor = ChatColor.WHITE, defNameColor = ChatColor.GRAY;
 	private Gradient nameGradient;
 	private Tag tag;
 	private ArrayList<Tag> tagCache;
 	private ArrayList<String> gradientCache;
+	
+	public static void load(List<String> ndefaults, List<String> cdefaults) {
+		nameColorDefaults.clear();
+		chatColorDefaults.clear();
+		for (String line : ndefaults) {
+			String[] split = line.split(":");
+			nameColorDefaults.add(new StringPair(split[0], split[1]));
+		}
+		
+		for (String line : cdefaults) {
+			String[] split = line.split(":");
+			chatColorDefaults.add(new StringPair(split[0], split[1]));
+		}
+	}
 	
 	public TagAccount(Player p) {
 		this.p = p;
@@ -87,6 +106,7 @@ public class TagAccount {
 			}
 			this.nickname = (String) pfields.getValue(uuid, "nick");
 		}
+		calculateDefaults(true);
 		calculateDisplay();
 	}
 
@@ -110,7 +130,7 @@ public class TagAccount {
 	}
 
 	public ChatColor getChatColor() {
-		return chatColor != null ? chatColor : TagManager.getChatColor("Default");
+		return chatColor != null ? chatColor : defChatColor;
 	}
 
 	public void setChatColor(String id, ChatColor chatColor) {
@@ -124,7 +144,7 @@ public class TagAccount {
 	}
 
 	public ChatColor getNameColor() {
-		return nameColor;
+		return nameColor != null ? nameColor : defNameColor;
 	}
 
 	public void setNameColor(String id, ChatColor nameColor) {
@@ -199,20 +219,48 @@ public class TagAccount {
 		tagCache = null;
 		gradientCache = null;
 	}
+	
+	public void calculateDefaults(boolean initial) {
+		boolean changed = false;
+		for (StringPair pair : nameColorDefaults) {
+			if (p.hasPermission(pair.getKey())) {
+				ChatColor newNameColor = TagManager.getNameColor(pair.getValue());
+				if (defNameColor.equals(newNameColor)) {
+					changed = true;
+					defNameColor = newNameColor;
+				}
+			}
+		}
+		for (StringPair pair : chatColorDefaults) {
+			if (p.hasPermission(pair.getKey())) {
+				ChatColor newChatColor = TagManager.getNameColor(pair.getValue());
+				if (defChatColor.equals(newChatColor)) {
+					changed = true;
+					defChatColor = newChatColor;
+				}
+			}
+		}
+		
+		// Reset everything if a new default was made available
+		if (changed && !initial) {
+			setNameGradient(null);
+			setNameColor(null, null);
+			setChatColor(null, null);
+		}
+	}
 
 	private void calculateDisplay() {
-		if (nameColor != null) {
-			display = nameColor + p.getName();
-			nickDisplay = nameColor + (nickname != null ? "*" + nickname : p.getName());
-		}
-		else if (nameGradient != null) {
+		if (nameGradient != null) {
 			display = nameGradient.apply(p.getName());
 			nickDisplay = nameGradient.apply(nickname != null ? "*" + nickname : p.getName());
 		}
+		else if (nameColor != null) {
+			display = nameColor + p.getName();
+			nickDisplay = nameColor + (nickname != null ? "*" + nickname : p.getName());
+		}
 		else {
-			ChatColor c = TagManager.getNameColor("Default");
-			display = c + p.getName();
-			nickDisplay = c + (nickname != null ? nickname : p.getName());
+			display = defNameColor + p.getName();
+			nickDisplay = defNameColor + (nickname != null ? nickname : p.getName());
 		}
 	}
 }

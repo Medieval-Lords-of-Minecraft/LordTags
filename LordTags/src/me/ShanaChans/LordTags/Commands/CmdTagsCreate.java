@@ -27,7 +27,7 @@ public class CmdTagsCreate extends Subcommand
 			sender.sendMessage("§7You are already creating a Tag!");
 			return;
 		}
-		String id = SharedUtil.connectArgs(args, 1).replaceAll(" ", "");
+		String id = SharedUtil.connectArgs(args).replaceAll(" ", "");
 		Tag tag = new Tag(id);
 		TagManager.getTagCreation().put(author, tag);
 		tag.preview(sender);

@@ -9,9 +9,9 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.TreeSet;
 import java.util.UUID;
 import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
@@ -29,7 +29,6 @@ import me.neoblade298.neocore.bukkit.NeoCore;
 import me.neoblade298.neocore.bukkit.bungee.BungeeAPI;
 import me.neoblade298.neocore.bukkit.bungee.PluginMessageEvent;
 import me.neoblade298.neocore.bukkit.commands.SubcommandManager;
-import me.neoblade298.neocore.bukkit.io.IOComponent;
 import me.neoblade298.neocore.bukkit.io.IOType;
 import me.neoblade298.neocore.bukkit.player.PlayerFields;
 import me.neoblade298.neocore.bukkit.util.Util;
@@ -46,8 +45,9 @@ public class TagManager extends JavaPlugin implements Listener {
 	private static HashMap<String, ChatColor> nameColors = new HashMap<String, ChatColor>();
 	private static HashMap<String, ChatColor> chatColors = new HashMap<String, ChatColor>();
 
-	private static ArrayList<String> tagList = new ArrayList<String>();
+	private static TreeSet<String> tagList = new TreeSet<String>();
 	private static ArrayList<String> gradientList = new ArrayList<String>();
+	
 	
 	private static HashMap<String, Tag> tagCreation = new HashMap<String, Tag>();
 
@@ -62,6 +62,8 @@ public class TagManager extends JavaPlugin implements Listener {
 		pfields.initializeField("tag", "");
 		pfields.initializeField("nick", "");
 		pfields.initializeField("namegradient", "");
+		pfields.initializeField("namecolor", "");
+		pfields.initializeField("chatcolor", "");
 
 		Bukkit.getPluginManager().registerEvents(new LuckPermsListener(), this);
 		try (Connection con = NeoCore.getConnection("TagManager");
@@ -98,6 +100,8 @@ public class TagManager extends JavaPlugin implements Listener {
 					chatColors.put(key, ChatColor.of(Color.decode(chatcolors.getString(key))));
 				}
 				ChatColorInventory.initialize(chatColors.keySet());
+				
+				TagAccount.load(yml.getStringList("namecolordefaults"), yml.getStringList("chatcolordefaults"));
 			});
 		} catch (NeoIOException e) {
 			e.printStackTrace();
@@ -167,7 +171,7 @@ public class TagManager extends JavaPlugin implements Listener {
 		return accounts.get(uuid);
 	}
 
-	public static ArrayList<String> getTagList() {
+	public static TreeSet<String> getTagList() {
 		return tagList;
 	}
 	
@@ -177,6 +181,10 @@ public class TagManager extends JavaPlugin implements Listener {
 
 	public static void clearCaches(UUID uuid) {
 		accounts.get(uuid).clearCaches();
+	}
+	
+	public static void recalculateDefaults(UUID uuid) {
+		accounts.get(uuid).calculateDefaults(false);
 	}
 
 	public static TagManager inst() {
@@ -196,7 +204,7 @@ public class TagManager extends JavaPlugin implements Listener {
 		tags.put(tag.getId(), tag);
 		tagList.add(tag.getId());
 		String gradientSql = tag.getGradient() != null ? "'" + tag.getGradient() + "'" : "null";
-		BungeeAPI.sendPluginMessage("lordtags_newtag", new String[] { tag.getId(), tag.getDisplay(), tag.getDesc(), tag.getGradient() });
+		BungeeAPI.sendPluginMessage("lordtags_newtag", new String[] { tag.getId(), tag.getDisplay(), tag.getDesc(), tag.getGradient() != null ? tag.getGradient() : "" });
 		try (Connection con = NeoCore.getConnection("TagManager"); Statement stmt = con.createStatement();) {
 			stmt.executeUpdate("INSERT INTO lordtags_tags Values('" + tag.getSqlId() + "','" + tag.getSqlDisplay()
 					+ "','" + tag.getSqlDesc() + "'," + gradientSql + ");");

@@ -28,24 +28,26 @@ public class LuckPermsListener implements Listener {
         EventBus eventBus = api.getEventBus();
 
         eventBus.subscribe(pl, NodeAddEvent.class, e -> {
-        	System.out.println("Key: " + e.getNode().getKey())
-        	System.out.println("Type: " + e.getNode().getType());
-        	if (!e.getNode().getKey().startsWith("lordtags.")) return;
         	if (!e.isUser()) return;
-        	
+        	String key = e.getNode().getKey();
     		UUID uuid = UUID.fromString(e.getTarget().getIdentifier().getName());
-    		if (recentlyJoined.contains(uuid)) return;
-    		
-    		TagManager.clearCaches(uuid);
+        	if (key.startsWith("lordtags.")) {
+        		handleTagUpdate(uuid);
+        	}
+        	else if (key.startsWith("group.")) {
+        		handleGroupUpdate(uuid);
+        	}
         });
         eventBus.subscribe(pl, NodeRemoveEvent.class, e -> {
-        	if (!e.getNode().getKey().startsWith("lordtags.")) return;
         	if (!e.isUser()) return;
-        	
+        	String key = e.getNode().getKey();
     		UUID uuid = UUID.fromString(e.getTarget().getIdentifier().getName());
-    		if (recentlyJoined.contains(uuid)) return;
-    		
-    		TagManager.clearCaches(uuid);
+        	if (key.startsWith("lordtags.")) {
+        		handleTagUpdate(uuid);
+        	}
+        	else if (key.startsWith("group.")) {
+        		handleGroupUpdate(uuid);
+        	}
         });
 	}
 	
@@ -56,6 +58,16 @@ public class LuckPermsListener implements Listener {
 			public void run() {
 				recentlyJoined.remove(e.getPlayer().getUniqueId());
 			}
-		}.runTaskLater(TagManager.inst(), 100L);
+		}.runTaskLater(TagManager.inst(), 20L);
+	}
+	
+	private void handleTagUpdate(UUID uuid) {
+		if (recentlyJoined.contains(uuid)) return;
+		
+		TagManager.clearCaches(uuid);
+	}
+	
+	private void handleGroupUpdate(UUID uuid) {
+		TagManager.recalculateDefaults(uuid);
 	}
 }

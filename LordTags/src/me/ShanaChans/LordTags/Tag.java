@@ -22,7 +22,7 @@ public class Tag implements Comparable<Tag>
 		this.id = id.toLowerCase();
 		this.display = gradient != null ? GradientManager.applyGradient(gradient, display) : display;
 		this.desc = desc;
-		this.gradient = gradient;
+		this.gradient = gradient; // Sometimes will be null, sometimes "", doesn't matter since it's never saved after posting
 	}
 
 	public String getId() {
