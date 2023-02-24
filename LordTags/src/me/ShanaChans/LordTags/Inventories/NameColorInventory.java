@@ -24,10 +24,11 @@ import net.md_5.bungee.api.ChatColor;
 public class NameColorInventory extends CoreInventory
 {
 	private static ArrayList<String> colors;
+	private static int invSize = 9;
 	private TagAccount acct;
 	public NameColorInventory(Player p) 
 	{
-		super(p, Bukkit.createInventory(p, 9, "§4Name Color Selection"));
+		super(p, Bukkit.createInventory(p, invSize, "§4Name Color Selection"));
 		acct = TagManager.getAccount(p.getUniqueId());
 		invSetup();
 	}
@@ -38,6 +39,7 @@ public class NameColorInventory extends CoreInventory
 			colors.add(key);
 		}
 		Collections.sort(colors);
+		invSize = colors.size() + (colors.size() % 9);
 	}
 	
 	private ItemStack setupIcon(ChatColor c, String id) {
