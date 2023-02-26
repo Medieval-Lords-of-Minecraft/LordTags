@@ -39,7 +39,7 @@ public class NameColorInventory extends CoreInventory
 			colors.add(key);
 		}
 		Collections.sort(colors);
-		invSize = colors.size() + (colors.size() % 9);
+		invSize = 9 + colors.size() - (colors.size() % 9);
 	}
 	
 	private ItemStack setupIcon(ChatColor c, String id) {
