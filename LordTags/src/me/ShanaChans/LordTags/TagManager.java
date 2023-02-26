@@ -47,9 +47,9 @@ public class TagManager extends JavaPlugin implements Listener {
 			String d1 = ChatColor.stripColor(t1.getDisplay());
 			String d2 = ChatColor.stripColor(t2.getDisplay());
 			int comp = d1.compareTo(d2);
-			if (comp == 0) return comp;
-			
-			return t1.getId().compareTo(t2.getId());
+			if (comp != 0) return comp;
+			comp = t1.getId().compareTo(t2.getId());
+			return comp;
 		}
 	};
 	
