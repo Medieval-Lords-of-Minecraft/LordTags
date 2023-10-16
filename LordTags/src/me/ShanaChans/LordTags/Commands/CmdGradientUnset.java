@@ -9,14 +9,14 @@ import me.neoblade298.neocore.shared.commands.Arg;
 
 import me.neoblade298.neocore.bukkit.commands.Subcommand;
 import me.neoblade298.neocore.shared.commands.SubcommandRunner;
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.format.NamedTextColor;
 import me.neoblade298.neocore.bukkit.util.Util;
 
 public class CmdGradientUnset extends Subcommand
 {
 	public CmdGradientUnset(String key, String desc, String perm, SubcommandRunner runner) {
 		super(key, desc, perm, runner);
-		color = ChatColor.DARK_RED;
+		color = NamedTextColor.DARK_RED;
 		args.add(new Arg("player", false));
 	}
 

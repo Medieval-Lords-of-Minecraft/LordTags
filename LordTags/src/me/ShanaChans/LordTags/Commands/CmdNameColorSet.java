@@ -9,14 +9,14 @@ import me.neoblade298.neocore.shared.commands.Arg;
 
 import me.neoblade298.neocore.bukkit.commands.Subcommand;
 import me.neoblade298.neocore.shared.commands.SubcommandRunner;
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.format.NamedTextColor;
 import me.neoblade298.neocore.bukkit.util.Util;
 
 public class CmdNameColorSet extends Subcommand
 {
 	public CmdNameColorSet(String key, String desc, String perm, SubcommandRunner runner) {
 		super(key, desc, perm, runner);
-		color = ChatColor.DARK_RED;
+		color = NamedTextColor.DARK_RED;
 		args.add(new Arg("player", false), new Arg("color"));
 	}
 
@@ -33,7 +33,7 @@ public class CmdNameColorSet extends Subcommand
 			p = (Player) sender;
 		}
 		
-		ChatColor c = TagManager.getNameColor(args[offset]);
+		NamedTextColor c = TagManager.getNameColor(args[offset]);
 		if (c == null) {
 			Util.msg(sender, "&cThat color doesn't exist!");
 			return;

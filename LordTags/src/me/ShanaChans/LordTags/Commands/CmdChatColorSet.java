@@ -9,6 +9,7 @@ import me.neoblade298.neocore.shared.commands.Arg;
 
 import me.neoblade298.neocore.bukkit.commands.Subcommand;
 import me.neoblade298.neocore.shared.commands.SubcommandRunner;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.md_5.bungee.api.ChatColor;
 import me.neoblade298.neocore.bukkit.util.Util;
 
@@ -16,7 +17,7 @@ public class CmdChatColorSet extends Subcommand
 {
 	public CmdChatColorSet(String key, String desc, String perm, SubcommandRunner runner) {
 		super(key, desc, perm, runner);
-		color = ChatColor.DARK_RED;
+		color = NamedTextColor.DARK_RED;
 		args.add(new Arg("player", false), new Arg("color"));
 	}
 

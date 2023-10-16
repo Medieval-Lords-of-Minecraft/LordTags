@@ -11,5 +11,6 @@
 	<classpathentry kind="lib" path="src/NeoCore-0.0.1-SNAPSHOT.jar"/>
 	<classpathentry kind="lib" path="src/item-nbt-api-plugin-2.11.1.jar"/>
 	<classpathentry kind="lib" path="src/LuckPerms-Bukkit-5.4.55.jar"/>
+	<classpathentry kind="lib" path="src/adventure-api-4.14.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

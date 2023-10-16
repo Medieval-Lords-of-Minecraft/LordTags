@@ -36,8 +36,11 @@ import me.neoblade298.neocore.bukkit.player.PlayerFields;
 import me.neoblade298.neocore.bukkit.util.Util;
 import me.neoblade298.neocore.shared.commands.SubcommandRunner;
 import me.neoblade298.neocore.shared.exceptions.NeoIOException;
+import me.neoblade298.neocore.shared.io.Section;
 import me.neoblade298.neocore.shared.util.Gradient;
 import me.neoblade298.neocore.shared.util.GradientManager;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import net.md_5.bungee.api.ChatColor;
 
 public class TagManager extends JavaPlugin implements Listener {
@@ -56,8 +59,8 @@ public class TagManager extends JavaPlugin implements Listener {
 	private static TagManager inst;
 	private static HashMap<String, Tag> tags = new HashMap<String, Tag>();
 	private static HashMap<UUID, TagAccount> accounts = new HashMap<UUID, TagAccount>();
-	private static HashMap<String, ChatColor> nameColors = new HashMap<String, ChatColor>();
-	private static HashMap<String, ChatColor> chatColors = new HashMap<String, ChatColor>();
+	private static HashMap<String, TextColor> nameColors = new HashMap<String, TextColor>();
+	private static HashMap<String, TextColor> chatColors = new HashMap<String, TextColor>();
 
 	private static TreeSet<Tag> tagList = new TreeSet<Tag>(comp);
 	private static ArrayList<String> gradientList = new ArrayList<String>();
@@ -107,32 +110,28 @@ public class TagManager extends JavaPlugin implements Listener {
 	}
 	
 	public static void load() {
-		try {
-			NeoCore.loadFiles(new File("/home/MLMC/Resources/shared/LordTags/config.yml"), (yml, file) -> {
-				ConfigurationSection namecolors = yml.getConfigurationSection("namecolors");
-				for (String key : namecolors.getKeys(false)) {
-					nameColors.put(key, ChatColor.of(Color.decode(namecolors.getString(key))));
-				}
-				NameColorInventory.initialize(nameColors.keySet());
+		NeoCore.loadFiles(new File("/home/MLMC/Resources/shared/LordTags/config.yml"), (yml, file) -> {
+			Section namecolors = yml.getSection("namecolors");
+			for (String key : namecolors.getKeys()) {
+				nameColors.put(key, ChatColor.of(Color.decode(namecolors.getString(key))));
+			}
+			NameColorInventory.initialize(nameColors.keySet());
 
-				ConfigurationSection chatcolors = yml.getConfigurationSection("chatcolors");
-				for (String key : chatcolors.getKeys(false)) {
-					chatColors.put(key, ChatColor.of(Color.decode(chatcolors.getString(key))));
-				}
-				ChatColorInventory.initialize(chatColors.keySet());
-				
-				TagAccount.load(yml.getStringList("namecolordefaults"), yml.getStringList("chatcolordefaults"));
-			});
-		} catch (NeoIOException e) {
-			e.printStackTrace();
-		}
+			Section chatcolors = yml.getSection("chatcolors");
+			for (String key : chatcolors.getKeys()) {
+				chatColors.put(key, ChatColor.of(Color.decode(chatcolors.getString(key))));
+			}
+			ChatColorInventory.initialize(chatColors.keySet());
+			
+			TagAccount.load(yml.getStringList("namecolordefaults"), yml.getStringList("chatcolordefaults"));
+		});
 	}
 	
-	public static ChatColor getChatColor(String key) {
+	public static NamedTextColor getChatColor(String key) {
 		return chatColors.get(key);
 	}
 	
-	public static ChatColor getNameColor(String key) {
+	public static NamedTextColor getNameColor(String key) {
 		return nameColors.get(key);
 	}
 
@@ -142,7 +141,7 @@ public class TagManager extends JavaPlugin implements Listener {
 	}
 
 	private void initCommands() {
-		SubcommandManager tags = new SubcommandManager("tags", "mycommand.staff", ChatColor.DARK_RED, this);
+		SubcommandManager tags = new SubcommandManager("tags", "mycommand.staff", NamedTextColor.DARK_RED, this);
 		tags.register(new CmdTagsAutopost("autopost", "Automatically finds a usable id and gives the player the tag",
 				null, SubcommandRunner.BOTH));
 		tags.register(new CmdTagsCreate("create", "Start tag creation", null, SubcommandRunner.BOTH));
